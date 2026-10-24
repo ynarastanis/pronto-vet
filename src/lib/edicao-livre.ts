@@ -25,7 +25,7 @@ export function precisaConfirmarFechar(estado: EstadoEdicao): boolean {
   return estado.aberta && estado.texto !== estado.abertura;
 }
 
-export function fechar(_estado: EstadoEdicao): EstadoEdicao {
+export function fechar(): EstadoEdicao {
   return estadoInicial;
 }
 

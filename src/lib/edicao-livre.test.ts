@@ -58,7 +58,7 @@ describe("edicao-livre", () => {
   });
 
   it("fechar descarta a edição e volta ao gerado", () => {
-    const e = fechar(editar(abrir(estadoInicial, "gerado"), "meu texto"));
+    const e = fechar();
     expect(e).toEqual(estadoInicial);
     expect(textoExibido(e, "gerado novo")).toBe("gerado novo");
   });
