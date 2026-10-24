@@ -19,6 +19,8 @@ Página /entrar, actions entrar/sair, exigirSessao, proxy.ts protegendo as rotas
 
 ## Notas do Líder
 
+- Herdado da revisão da T004: tratar `APP_SECRET` só com espaços como não configurado (simetria com `APP_PASSWORD`). Ajustar `assinarToken`/`verificarToken` em `src/lib/auth/token.ts` para `!segredo?.trim()`, com teste (TDD).
+
 
 
 ---

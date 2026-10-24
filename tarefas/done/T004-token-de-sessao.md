@@ -1,6 +1,6 @@
 # T004 — Token de sessão e verificação de senha
 
-- **Status:** em revisão
+- **Status:** concluída
 - **Prioridade:** P1
 - **Depende de:** T001
 - **Referência na spec:** §8
@@ -74,3 +74,20 @@ npm test          -> Test Files 5 passed (5); Tests 34 passed (34)
   - [ ] `src/lib/auth/token.test.ts:18` — "recusa assinatura adulterada" só passa porque o último caractere atual (`w`) muda para `A`, que altera bits significativos; trocar por um caractere que só altere os bits ignorados faria o teste falhar. — Adulterar um caractere do meio da assinatura (ou o primeiro).
   - [ ] `src/lib/auth/token.ts:84` — `APP_PASSWORD` só com espaços (`" "`) é tratada como configurada e aceita `" "` como senha. Pela letra do plano não é "vazia"; se a intenção for falhar fechado também nesse caso, usar `!esperada?.trim()`. Decisão do Líder.
   - [ ] `src/lib/auth/token.ts:41` — `assinarToken` aceita `expiraEm` não inteiro (`NaN`, `1.5`) e gera um token que nunca valida (falha fechado, sem risco). — Opcional: lançar se `!Number.isSafeInteger(expiraEm)`, para o erro aparecer no T006 em vez de um login que "não pega".
+
+---
+
+- **Rodada:** 2
+- **Veredito:** aprovado
+- **Verificação (rodada pelo Revisor):** `npx vitest run src/lib/auth` → 12/12 passando; `npm run lint` sem erros; `npm run typecheck` sem erros; `npm test` → 5 arquivos, 34 testes passando. Diff completo revisado dos commits `T004:` em `src/lib/auth/`: 09efee6 e 0f071f8. Sem `node:crypto` em `src/`.
+- **Os 4 itens da decisão do Líder:**
+  1. Conferido. `deBase64Url` (`token.ts:32`) recusa quando `paraBase64Url(bytes) !== texto`; tokens legítimos continuam válidos, porque `assinarToken` usa o mesmo codificador. O teste novo passa os 64 caracteres pela última posição e exige exatamente 1 aceito, o que cobre as 3 variações maleáveis da rodada 1.
+  2. Conferido. O teste troca o caractere de índice 23 (o 19º da assinatura, que não é o último) por `A`/`B`, sempre mudando bits significativos.
+  3. Conferido. `senhaConfere` usa `!esperada?.trim()` (`token.ts:86`); o teste cobre `" "` e `"   "`. A comparação continua sem trim (senha `" abc "` configurada exige `" abc "`), como deve ser.
+  4. Conferido. `assinarToken` lança `"expiraEm inválido"` para valor não inteiro seguro ou `<= 0` (`token.ts:43`); o teste cobre `NaN`, `1.5`, `0`, `-1`, `Infinity` e `MAX_SAFE_INTEGER + 1`. A checagem do segredo vem antes, então a mensagem "APP_SECRET não configurado" continua com prioridade.
+- **Conformidade:** interfaces iguais às do plano (Task T004). A regra de `trim` em `senhaConfere` é mais restrita que "vazia/ausente", conforme a decisão do Líder. Todos os testes do Passo 1 estão presentes; o de adulteração foi fortalecido, e não apenas trocado. Mensagens em pt-BR. Nada além do que foi decidido (YAGNI).
+- **Foco de revisão, item 4 (falhar fechado):** continua confirmado. Sem `APP_SECRET`, nenhum token é emitido ou aceito; sem `APP_PASSWORD`, ou com ela vazia ou só com espaços, nenhuma senha confere; `verificarToken` continua todo dentro de `try/catch`.
+- **Apontamentos bloqueantes:** nenhum.
+- **Sugestões opcionais (não bloqueiam):**
+  - [ ] `src/lib/auth/token.ts:42` — `APP_SECRET` só com espaços (`" "`) ainda é aceito como segredo, o que não segue a regra adotada para `APP_PASSWORD` no item 3. O segredo continua sendo HMAC e não é adivinhável só por ser fraco, mas o caso é o mesmo de configuração errada. — Se o Líder quiser simetria, usar `!segredo?.trim()` em `assinarToken` e em `verificarToken`, com teste. Decisão do Líder; dá para resolver em T006 junto com a leitura do ambiente.
+  - [ ] `src/lib/auth/token.test.ts:20` — o comentário `2 + 1 + 20 // depois de "2000."` não bate com a conta (`"2000."` tem 5 caracteres). O índice 23 cai dentro da assinatura, então o teste está correto. — Escrever `"2000.".length + 18`, ou corrigir o comentário.
