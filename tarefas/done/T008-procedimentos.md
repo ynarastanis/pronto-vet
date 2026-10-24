@@ -1,6 +1,6 @@
 # T008 — Cadastro de procedimentos e descrição anestésica
 
-- **Status:** implementando
+- **Status:** concluída
 - **Prioridade:** P2
 - **Depende de:** T003, T005, T006, T012
 - **Referência na spec:** §5, §7, §9
