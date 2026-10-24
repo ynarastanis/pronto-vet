@@ -45,6 +45,20 @@ npm run typecheck -> tsc --noEmit (sem erros)
 npm test          -> Test Files 5 passed (5); Tests 31 passed (31)
 ```
 
+### Rodada 2
+
+- **Resumo:** as 4 sugestões do Revisor. (1) `deBase64Url` recusa base64url não canônico (`paraBase64Url(bytes) !== texto`); (2) teste de adulteração troca um caractere do meio da assinatura; (3) `senhaConfere` trata `APP_PASSWORD` só com espaços como não configurada (`!esperada?.trim()`); (4) `assinarToken` lança `Error("expiraEm inválido")` se `expiraEm` não for inteiro seguro positivo. Testes novos de (1), (3) e (4) falharam antes da correção (3 falhas, 9 passando) e passaram depois; o do item 2 já passava, pois só fortalece o teste.
+- **Arquivos:** src/lib/auth/token.ts, src/lib/auth/token.test.ts
+- **Commits:** 0f071f8 T004: endurece token (base64url canônico, expiraEm válido, senha só com espaços)
+- **Saída de lint / typecheck / testes:**
+
+```
+npx vitest run src/lib/auth -> 1 arquivo, 12 testes passando
+npm run lint      -> eslint . (sem erros)
+npm run typecheck -> tsc --noEmit (sem erros)
+npm test          -> Test Files 5 passed (5); Tests 34 passed (34)
+```
+
 ## Revisão
 
 <!-- preenchido pelo Revisor (Opus, sessão limpa) -->
