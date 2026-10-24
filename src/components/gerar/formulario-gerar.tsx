@@ -1,11 +1,10 @@
 "use client";
 
-import { Slice, Syringe, UserRound, Weight } from "lucide-react";
+import { ClipboardPlus, Slice, Syringe, UserRound, Weight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CampoProfissional } from "@/components/gerar/campo-profissional";
 import { CartaoTexto } from "@/components/gerar/cartao-texto";
 import { ComboboxProcedimento } from "@/components/gerar/combobox-procedimento";
-import { IconeMascara } from "@/components/icone-mascara";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -102,7 +101,7 @@ export function FormularioGerar({
       >
         <div className="flex min-w-0 flex-col gap-2">
           <Label htmlFor="procedimento">
-            <IconeMascara aria-hidden className="size-4 text-muted-foreground" />
+            <ClipboardPlus aria-hidden className="size-4 text-muted-foreground" />
             Procedimento
           </Label>
           <ComboboxProcedimento

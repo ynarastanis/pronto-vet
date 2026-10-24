@@ -109,10 +109,10 @@ Sem animação automática na carga das páginas além do fade de 160ms. Sem hov
 | Onde | Ícone |
 |---|---|
 | Link Gerar | `ClipboardList` |
-| Link Procedimentos | `IconeMascara` (próprio) |
+| Link Procedimentos | `ClipboardPlus` |
 | Link Profissionais | `Users` |
 | Sair | `LogOut` |
-| Campo Procedimento / combobox | `IconeMascara` + `ChevronsUpDown` |
+| Campo Procedimento / combobox | `ClipboardPlus` + `ChevronsUpDown` |
 | Campo Cirurgião | `UserRound` |
 | Campo Anestesista | `Syringe` |
 | Campo Peso | `Weight` |
@@ -130,7 +130,7 @@ Sem animação automática na carga das páginas além do fade de 160ms. Sem hov
 | Página não encontrada / erro | `SearchX` / `TriangleAlert` |
 | Login | `KeyRound` no campo Senha |
 
-**Ícone de procedimento:** `src/components/icone-mascara.tsx` — máscara cirúrgica desenhada no estilo lucide (viewBox 24, traço 1.75, `currentColor`, cantos arredondados), substitui a tesoura (que não comunicava "procedimento"; a lucide não tem máscara cirúrgica). Corpo com 2 pregas horizontais e alças laterais.
+**Ícone de procedimento:** `ClipboardPlus` (lucide). A máscara própria foi descartada a pedido do usuário; cirurgia usa `Slice`.
 
 ## Edição livre do texto gerado (cadeado)
 
