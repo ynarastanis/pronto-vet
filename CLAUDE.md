@@ -25,7 +25,9 @@ Next.js (App Router, Server Components + Server Actions), Prisma, Postgres (Neon
 - Leitura de dados em Server Components; escrita apenas via Server Actions em `src/actions/`.
 - Toda Server Action: (1) verifica a sessão, (2) valida com o schema Zod de `src/lib/validacao/`, (3) retorna `{ ok: true }` ou `{ ok: false, erros }`.
 - Lógica de domínio em **funções puras** em `src/lib/` — sem I/O, sem `Date.now()` implícito (receba "agora" como parâmetro quando precisar).
-- Um único `PrismaClient` em `src/lib/db.ts`.
+- **Dados só via `servicos()`** (`src/servicos/index.ts`). Páginas, actions e componentes nunca importam Prisma nem `src/lib/db.ts`; tratam `ErroNomeDuplicado` / `ErroNaoEncontrado`, nunca códigos `P20xx`.
+- Toda mudança de contrato em `src/servicos/tipos.ts` é implementada nas duas fontes (memória e Prisma) e coberta pelos testes de contrato da memória.
+- Um único `PrismaClient` em `src/lib/db.ts`, usado apenas por `src/servicos/prisma/` e `prisma/seed.ts`.
 - Não persistir nenhum dado de paciente.
 - Não adicionar dependências fora da stack sem registrar a decisão em `ARCHITECT.md`.
 - YAGNI: nada fora do escopo da spec sem tarefa aprovada pelo Líder.
@@ -43,4 +45,4 @@ Next.js (App Router, Server Components + Server Actions), Prisma, Postgres (Neon
 
 ## Segredos e ambiente
 
-`DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD`, `APP_SECRET` — apenas via variáveis de ambiente.
+`FONTE_DADOS`, `DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD`, `APP_SECRET` — apenas via variáveis de ambiente. Desenvolvimento local usa `FONTE_DADOS=memoria` até a implementação Prisma existir; produção nunca define `memoria`.

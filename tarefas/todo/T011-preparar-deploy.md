@@ -1,10 +1,10 @@
-# T010 — Preparação do deploy
+# T011 — Preparação do deploy
 
 - **Status:** a fazer
 - **Prioridade:** P3
-- **Depende de:** T001–T009
+- **Depende de:** T001–T010
 - **Referência na spec:** §11
-- **Plano:** `docs/superpowers/plans/2026-10-24-pronto-vet.md` → *Task T010* (passos, interfaces e testes exatos)
+- **Plano:** `docs/superpowers/plans/2026-10-24-pronto-vet.md` → *Task T011* (passos, interfaces e testes exatos)
 
 ## Objetivo
 

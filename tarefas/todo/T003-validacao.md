@@ -18,7 +18,7 @@ Schemas Zod com mensagens em pt-BR, validarFormulario e os tipos ResultadoValida
 
 ## Notas do Líder
 
-Pode rodar em paralelo com T002, T004 e T005.
+Pode rodar em paralelo com T002 e T004.
 
 ---
 

@@ -19,7 +19,7 @@ assinarToken, verificarToken e senhaConfere com Web Crypto, falhando fechado sem
 
 ## Notas do Líder
 
-Pode rodar em paralelo com T002, T003 e T005.
+Pode rodar em paralelo com T002 e T003.
 
 ---
 

@@ -57,3 +57,10 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
 - **Status:** aceita (2026-10-24)
 - **Decisão:** Tailwind para estilos; componentes shadcn/ui (select com busca, toast, dialog de confirmação).
 - **Consequências:** componentes copiados para `src/components/ui`, sem dependência de biblioteca de UI fechada.
+
+## ADR-009 — Camada de serviços com mock em memória antes do banco
+
+- **Status:** aceita (2026-10-24)
+- **Contexto:** o usuário quer validar a experiência (telas, fluxos, textos gerados) antes de conectar ao Neon.
+- **Decisão:** contratos `ServicoProfissionais` e `ServicoProcedimentos` em `src/servicos/tipos.ts`, com implementação em memória (dados de demonstração) e, depois do checkpoint de validação, implementação Prisma. Páginas e actions acessam dados apenas via `servicos()`. Erros de domínio (`ErroNomeDuplicado`, `ErroNaoEncontrado`) substituem códigos do Prisma fora de `src/servicos/prisma/`. `FONTE_DADOS=memoria` ativa o mock; qualquer outro valor ou ausência usa Prisma (falha segura em produção).
+- **Consequências:** Prisma fica isolado e trocável; a implementação em memória ganha testes de contrato. O mock só é confiável localmente (memória por instância em serverless). Complementa ADR-002; o mapeamento de erros sai das actions e vai para a implementação Prisma.

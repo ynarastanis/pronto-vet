@@ -18,7 +18,7 @@ Funções puras gerarTextoCirurgico e gerarTextoAnestesico, em TDD, conforme o f
 
 ## Notas do Líder
 
-Pode rodar em paralelo com T003, T004 e T005.
+Pode rodar em paralelo com T003 e T004.
 
 ---
 

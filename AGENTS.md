@@ -45,4 +45,6 @@ tarefas/
 
 ## Escalonamento ao usuário
 
-O Líder para e consulta o usuário quando: uma tarefa exige mudar a spec ou o modelo de dados; o Revisor e o Implementador divergem duas rodadas seguidas; surge dependência nova fora da stack.
+**Checkpoint de validação da experiência:** concluídas T001–T009 (telas sobre o mock em memória), o Líder **para** e pede ao usuário que valide o app localmente (`FONTE_DADOS=memoria npm run dev`). Ajustes viram novas tarefas; T010 (banco) só começa com o aval do usuário.
+
+O Líder também para e consulta o usuário quando: uma tarefa exige mudar a spec ou o modelo de dados; o Revisor e o Implementador divergem duas rodadas seguidas; surge dependência nova fora da stack.

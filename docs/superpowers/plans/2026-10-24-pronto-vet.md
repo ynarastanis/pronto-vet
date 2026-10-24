@@ -4,7 +4,7 @@
 
 **Objetivo:** app web em pt-BR para cadastrar profissionais e procedimentos (descrição cirúrgica + descrição anestésica) e gerar os dois textos de prontuário para copiar separadamente.
 
-**Arquitetura:** Next.js App Router — Server Components leem via Prisma, Server Actions escrevem com validação Zod. Geração de texto em funções puras no cliente. Acesso protegido por senha compartilhada com cookie HMAC verificado no `proxy.ts` e em toda Server Action.
+**Arquitetura:** Next.js App Router — Server Components leem e Server Actions escrevem (com validação Zod) **somente via `servicos()`**, uma camada de serviços com implementação em memória (mock, T005) e, após o checkpoint de validação do usuário, implementação Prisma (T010). Geração de texto em funções puras no cliente. Acesso protegido por senha compartilhada com cookie HMAC verificado no `proxy.ts` e em toda Server Action.
 
 **Stack:** Next.js 16, React, TypeScript, Prisma 7 + `@prisma/adapter-neon`, Postgres (Neon), Zod 4, Tailwind CSS 4, shadcn/ui, Vitest 5.
 
@@ -19,7 +19,8 @@
 - Scripts obrigatórios em `package.json`: `lint` (`eslint .`), `typecheck` (`tsc --noEmit`), `test` (`vitest run`).
 - Commits: `T<NNN>: <descrição pt-BR no imperativo>`.
 - Nenhum dado de paciente persistido; peso só existe no estado do cliente.
-- Variáveis de ambiente: `DATABASE_URL` (pooled), `DIRECT_URL` (direta), `APP_PASSWORD`, `APP_SECRET`.
+- Variáveis de ambiente: `FONTE_DADOS` (`memoria` no dev até T010), `DATABASE_URL` (pooled), `DIRECT_URL` (direta), `APP_PASSWORD`, `APP_SECRET`.
+- Páginas, actions e componentes acessam dados **apenas** via `servicos()`; nunca importam Prisma nem `src/lib/db.ts`.
 
 ## Foco de revisão
 
@@ -27,18 +28,23 @@
 2. **Campo opcional só com espaços** → tratado como vazio: salvo como `null` (T003) e linha omitida (T002).
 3. **Peso digitado com unidade** ("5 kg", "5kg") → não gerar "5 kg kg" (T002).
 4. **`APP_PASSWORD` ou `APP_SECRET` ausentes/vazios no ambiente** → login sempre recusado, token nunca válido; falhar fechado (T004).
-5. **Profissional salvo no `localStorage` foi excluído** → seleção ignorada, sem erro (T009).
+5. **`FONTE_DADOS` ausente ou com valor inesperado em produção** → nunca usar o mock em memória (T005, `escolherFonte`).
+
+(O caso "profissional salvo no `localStorage` foi excluído" também tem teste, em T009.)
 
 ## Dependências entre tasks
 
 ```
-T001 ─┬─ T002 ───────────────┐
-      ├─ T003 ─┬─ T006 ─┬─ T007
-      ├─ T004 ─┘        ├─ T008
-      └─ T005 ──────────┴─ T009 ── T010
+T001 ─┬─ T002 ─┬───────────────────────┐
+      ├─ T003 ─┼─ T005 ──┐             │
+      │        └─ T006 ──┼─ T007 ──┐   │
+      └─ T004 ───┘       ├─ T008 ──┼─ T009 ── ⏸ checkpoint ── T010 ── T011
+                         └─────────┘
 ```
 
-T002, T003, T004 e T005 podem rodar em paralelo após T001 (arquivos disjuntos). T007 e T008 podem rodar em paralelo (arquivos disjuntos; ambos só *leem* `src/lib/`).
+- T002, T003 e T004 podem rodar em paralelo após T001. T005 precisa dos tipos de T002 e T003; T006 precisa de T003 e T004 — T005 e T006 podem rodar em paralelo.
+- T007 e T008 podem rodar em paralelo (arquivos disjuntos). T009 depende de T002, T005 e T006.
+- **⏸ Checkpoint:** após T009 o Líder para; o usuário valida a experiência localmente com o mock. T010 só começa com o aval.
 
 ## Mapa de arquivos
 
@@ -48,12 +54,13 @@ T002, T003, T004 e T005 podem rodar em paralelo após T001 (arquivos disjuntos).
 | `src/lib/texto/tipos.ts`, `cirurgico.ts`, `anestesico.ts`, `normalizar.ts` (+ `.test.ts`) | Geração dos textos | T002 |
 | `src/lib/validacao/validar.ts`, `profissional.ts`, `procedimento.ts`, `descricao-anestesica.ts` (+ `.test.ts`) | Schemas Zod e resultado das actions | T003 |
 | `src/lib/auth/token.ts` (+ `.test.ts`) | Token HMAC e comparação de senha | T004 |
-| `prisma/schema.prisma`, `prisma.config.ts`, `prisma/seed.ts`, `src/lib/db.ts`, `src/lib/erros-prisma.ts` (+ `.test.ts`) | Banco | T005 |
+| `src/servicos/tipos.ts`, `erros.ts`, `fonte.ts` (+ `.test.ts`), `index.ts`, `src/servicos/memoria/*` (+ `.test.ts`) | Contratos e mock em memória | T005 |
 | `src/lib/auth/sessao.ts`, `src/proxy.ts`, `src/actions/auth.ts`, `src/app/entrar/page.tsx`, `src/components/barra-navegacao.tsx` | Login e navegação | T006 |
 | `src/actions/profissionais.ts`, `src/app/profissionais/page.tsx`, `src/components/profissionais/*` | CRUD de profissionais | T007 |
 | `src/actions/procedimentos.ts`, `src/app/procedimentos/**`, `src/components/procedimentos/*`, `src/components/confirmar-exclusao.tsx` | CRUD de procedimentos + descrição anestésica | T008 |
 | `src/lib/preferencias.ts` (+ `.test.ts`), `src/app/page.tsx`, `src/components/gerar/*`, `src/components/botao-copiar.tsx` | Tela Gerar | T009 |
-| `README.md`, ajustes em `package.json` | Deploy | T010 |
+| `prisma/schema.prisma`, `prisma.config.ts`, `prisma/seed.ts`, `src/lib/db.ts`, `src/servicos/prisma/*` (+ `erros.test.ts`) | Banco e implementação Prisma | T010 |
+| `README.md`, ajustes em `package.json` | Deploy | T011 |
 
 ---
 
@@ -303,36 +310,75 @@ it("senhaConfere recusa quando APP_PASSWORD não está definida") // ("", undefi
 
 ---
 
-### Task T005: Banco de dados
-
-**Pré-requisito (Líder):** pedir ao usuário as URLs do Neon (`DATABASE_URL` pooled e `DIRECT_URL`) de um branch de desenvolvimento e gravá-las em `.env` local (não commitado).
+### Task T005: Camada de serviços e mock em memória
 
 **Files:**
-- Create: `prisma/schema.prisma`, `prisma.config.ts`, `prisma/migrations/*`, `prisma/seed.ts`, `src/lib/db.ts`, `src/lib/erros-prisma.ts`
-- Test: `src/lib/erros-prisma.test.ts`
-- Modify: `package.json` (scripts `postinstall: prisma generate`, `db:migrate: prisma migrate dev`, `db:seed: tsx prisma/seed.ts`), `.gitignore` (`src/generated/`)
+- Create: `src/servicos/tipos.ts`, `src/servicos/erros.ts`, `src/servicos/fonte.ts`, `src/servicos/index.ts`, `src/servicos/memoria/dados-demonstracao.ts`, `src/servicos/memoria/profissionais.ts`, `src/servicos/memoria/procedimentos.ts`, `src/servicos/memoria/index.ts`
+- Test: `src/servicos/fonte.test.ts`, `src/servicos/memoria/memoria.test.ts`
+- Modify: `.env.example` (adicionar `FONTE_DADOS=memoria` com comentário "memoria = dados de demonstração em memória (apenas local); ausente = banco")
 
 **Interfaces:**
-- Consumes: nada além de T001 (o tipo de retorno abaixo é escrito inline para não depender de T003; é compatível com `ResultadoAcao`).
-- Produces:
+- Consumes: `DadosDescricaoAnestesica` (T002); `DadosProfissional`, `DadosProcedimentoForm`, `DadosDescricaoAnestesicaForm` (T003).
+- Produces: os tipos e interfaces da spec §13 em `tipos.ts` (`Papel`, `Profissional`, `Procedimento`, `ProcedimentoCompleto`, `ProcedimentoResumo`, `ServicoProfissionais`, `ServicoProcedimentos`, `Servicos`) — `ProcedimentoCompleto` deve ser atribuível a `DadosProcedimento` de T002. Além disso:
 
 ```ts
-// db.ts (import "server-only")
-export const db: PrismaClient; // singleton em globalThis no dev; adapter PrismaNeon({ connectionString: process.env.DATABASE_URL })
-// erros-prisma.ts
-export function traduzirErroPrisma(erro: unknown): { ok: false; erros: Record<string, string> } | null;
-  // code "P2002" → { ok: false, erros: { nome: "Já existe um procedimento com este nome." } }; outros → null
+// erros.ts
+export class ErroNomeDuplicado extends Error {} // message "Já existe um procedimento com este nome."
+export class ErroNaoEncontrado extends Error {} // message "Registro não encontrado."
+// fonte.ts
+export type FonteDados = "memoria" | "prisma";
+export function escolherFonte(valor: string | undefined): FonteDados; // trim + minúsculas === "memoria" → "memoria"; resto → "prisma"
+// memoria/index.ts
+export type EstadoMemoria = { profissionais: Profissional[]; procedimentos: Procedimento[] };
+export function criarServicosMemoria(estadoInicial?: EstadoMemoria): Servicos; // estado próprio, clonado da entrada (default: dados de demonstração)
+export function servicosMemoria(): Servicos; // singleton em globalThis.__prontoVetMemoria
+// index.ts (import "server-only")
+export function servicos(): Servicos;
+  // escolherFonte(process.env.FONTE_DADOS) === "memoria" → servicosMemoria()
+  // senão → throw new Error("Fonte de dados não configurada. Defina FONTE_DADOS=memoria para usar dados de demonstração.") — T010 troca por servicosPrisma()
 ```
 
-Modelos: exatamente os da spec §5 (`Papel`, `Profissional`, `ProcedimentoCirurgico`, `DescricaoAnestesica`). Generator `prisma-client` com `output = "../src/generated/prisma"`. `prisma.config.ts` com `import "dotenv/config"`, schema `prisma/schema.prisma`, migrations `prisma/migrations`, `seed: "tsx prisma/seed.ts"` e datasource url `DIRECT_URL`.
+Dados de demonstração (`dados-demonstracao.ts`, `export const DADOS_DEMONSTRACAO: EstadoMemoria`):
+- Procedimento `"OVARIOHISTECTOMIA (DEMONSTRAÇÃO)"`: `descricaoTecnica` e `prescricao` = os dois parágrafos do exemplo cirúrgico da conversa/spec (técnica até "…dermorrafia nylon 2-0 sultan."; prescrição começando em "Prescrito: …"); descrição anestésica = campos do exemplo anestésico (ASA "I", MPA, indução, manutenção, bloqueio, analgesia, antibiótico, pós imediato, observações — mesmos valores da fixture de T002).
+- Procedimento `"PROCEDIMENTO SEM DESCRIÇÃO ANESTÉSICA (DEMONSTRAÇÃO)"`: técnica "Texto de demonstração da técnica cirúrgica.", prescrição "Prescrito: texto de demonstração.", `descricaoAnestesica: null`.
+- Profissionais `"Cirurgião Exemplo"` (CIRURGIAO) e `"Anestesista Exemplo"` (ANESTESISTA).
+- Ids fixos legíveis (`"demo-ohe"`, `"demo-incompleto"`, `"demo-cirurgiao"`, `"demo-anestesista"`).
 
-- [ ] **Passo 1: Teste (falhando)** — `traduzirErroPrisma({ code: "P2002" })` → objeto acima; `traduzirErroPrisma(new Error("x"))` → `null`; `traduzirErroPrisma({ code: "P2025" })` → `null`.
-- [ ] **Passo 2: Rodar** → FAIL. **Passo 3: Implementar** (checagem por forma do objeto, sem `instanceof`). **Passo 4: Rodar** → PASS.
-- [ ] **Passo 5: Schema e migration** — `npm run db:migrate -- --name inicial` → migration criada e aplicada no branch de dev.
-- [ ] **Passo 6: `db.ts`** conforme Interfaces.
-- [ ] **Passo 7: Seed** — idempotente (`upsert` por `nome`): procedimento `"OVARIOHISTECTOMIA (DEMONSTRAÇÃO)"` com a técnica e a prescrição do exemplo cirúrgico da spec e a descrição anestésica do exemplo anestésico; profissionais `"Cirurgião Exemplo"` (CIRURGIAO) e `"Anestesista Exemplo"` (ANESTESISTA), criados só se não existir profissional com o mesmo nome. Rodar `npm run db:seed` duas vezes → sem duplicatas.
-- [ ] **Passo 8: Verificar** — `npm test && npm run lint && npm run typecheck && npm run build` → OK.
-- [ ] **Passo 9: Commit** — `T005: adiciona schema Prisma, migration inicial e seed`.
+Comportamento da memória: todos os métodos `async`; ordenação `a.nome.localeCompare(b.nome, "pt-BR")`; busca `nome.toLowerCase().includes(busca.trim().toLowerCase())` (busca vazia = todos); nome duplicado = igualdade exata após trim, ignorando o próprio registro no `atualizar`; retornos via `structuredClone`; ids novos via `crypto.randomUUID()`.
+
+- [ ] **Passo 1: Testes de `escolherFonte` (falhando)**
+
+```ts
+it("usa memória só quando FONTE_DADOS é 'memoria'")   // "memoria", " MEMORIA " → "memoria"
+it("usa prisma quando ausente, vazio ou outro valor")  // undefined, "", "prisma", "mock", "memória" → "prisma"
+```
+
+- [ ] **Passo 2: Testes de contrato da memória (falhando)** — cada teste usa `criarServicosMemoria(estado)` com estado próprio:
+
+```ts
+it("lista profissionais em ordem alfabética pt-BR")         // "Bruno", "andré", "Ágata" → ["Ágata", "andré", "Bruno"]
+it("cria, atualiza e exclui profissional")
+it("atualizar profissional inexistente lança ErroNaoEncontrado")
+it("excluir profissional inexistente não lança")
+it("busca procedimentos sem diferenciar maiúsculas")        // listar("ohe") encontra "OHE ELETIVA FELINA"; listar("") retorna todos
+it("resumo indica se há descrição anestésica")              // temDescricaoAnestesica true/false
+it("rejeita nome duplicado ao criar e ao atualizar")        // ErroNomeDuplicado; " OHE ELETIVA FELINA " também conflita
+it("permite atualizar mantendo o próprio nome")
+it("atualizar procedimento inexistente lança ErroNaoEncontrado")
+it("obter inexistente retorna null")
+it("listarCompletos retorna só procedimentos com descrição anestésica")
+it("salvarDescricaoAnestesica cria e depois atualiza")      // 2ª chamada substitui os campos
+it("salvarDescricaoAnestesica em procedimento inexistente lança ErroNaoEncontrado")
+it("excluir procedimento remove a descrição anestésica")    // obter → null; não aparece em listarCompletos
+it("retornos são cópias isoladas do estado")                // mutar objeto retornado não altera próximo listar()
+it("instâncias são independentes")                          // criar em uma não aparece na outra
+it("dados de demonstração têm um procedimento completo e um incompleto") // criarServicosMemoria() sem argumento
+```
+
+- [ ] **Passo 3: Rodar** `npx vitest run src/servicos` → FAIL.
+- [ ] **Passo 4: Implementar** `tipos.ts`, `erros.ts`, `fonte.ts`, `memoria/*`, `index.ts`.
+- [ ] **Passo 5: Rodar** `npm test`, `npm run lint`, `npm run typecheck` → OK.
+- [ ] **Passo 6: Commit** — `T005: adiciona camada de serviços com implementação em memória`.
 
 ---
 
@@ -380,7 +426,7 @@ export async function sair(): Promise<void>; // encerrarSessao(); redirect("/ent
 - Create: `src/components/confirmar-exclusao.tsx` (se T008 ainda não criou; quem chegar primeiro cria, o outro reutiliza)
 
 **Interfaces:**
-- Consumes: `db` (T005); `schemaProfissional`, `validarFormulario`, `ResultadoAcao` (T003); `exigirSessao` (T006).
+- Consumes: `servicos()`, `ErroNaoEncontrado` (T005); `schemaProfissional`, `validarFormulario`, `ResultadoAcao` (T003); `exigirSessao` (T006).
 - Produces:
 
 ```ts
@@ -394,7 +440,7 @@ export function ConfirmarExclusao(props: { titulo: string; descricao: string; ac
 ```
 
 - Página: título "Profissionais"; formulário inline no topo (Nome, Papel: select "Cirurgião"/"Anestesista", botão "Adicionar"); duas colunas **Cirurgiões** / **Anestesistas** (empilhadas no celular), ordenadas por nome; cada item com "Editar" (edição inline de nome e papel, "Salvar"/"Cancelar") e "Excluir" (título "Excluir profissional?", descrição "Esta ação não pode ser desfeita."). Coluna vazia: "Nenhum cirurgião cadastrado." / "Nenhum anestesista cadastrado.". Toast "Profissional salvo." após salvar.
-- Excluir id inexistente → ignorar silenciosamente (`deleteMany`).
+- Excluir id inexistente já é no-op no serviço. `ErroNaoEncontrado` ao atualizar → `notFound()`.
 
 - [ ] **Passo 1: Implementar** actions, página e componentes.
 - [ ] **Passo 2: Verificar manualmente** — adicionar um de cada papel; nome vazio mostra "Informe o nome."; editar troca de coluna ao mudar papel; excluir com confirmação.
@@ -410,7 +456,7 @@ export function ConfirmarExclusao(props: { titulo: string; descricao: string; ac
 - Create/reutilizar: `src/components/confirmar-exclusao.tsx` (ver T007)
 
 **Interfaces:**
-- Consumes: `db`, `traduzirErroPrisma` (T005); `schemaProcedimento`, `schemaDescricaoAnestesica`, `OPCOES_ASA`, `validarFormulario`, `ResultadoAcao` (T003); `exigirSessao` (T006).
+- Consumes: `servicos()`, `ErroNomeDuplicado`, `ErroNaoEncontrado` (T005); `schemaProcedimento`, `schemaDescricaoAnestesica`, `OPCOES_ASA`, `validarFormulario`, `ResultadoAcao` (T003); `exigirSessao` (T006).
 - Produces:
 
 ```ts
@@ -421,14 +467,14 @@ export async function excluirProcedimento(id: string): Promise<void>;           
 export async function salvarDescricaoAnestesica(procedimentoId: string, estado: ResultadoAcao, formData: FormData): Promise<ResultadoAcao>; // upsert
 ```
 
-- Erros de banco: `traduzirErroPrisma(e) ?? throw e`. Atualizar/salvar com id inexistente (P2025) → `notFound()`.
-- `/procedimentos`: título "Procedimentos", botão "Novo procedimento", busca por nome via `?q=` (`contains`, `mode: "insensitive"`), lista ordenada por nome; selo (Badge) **"sem descrição anestésica"**; vazio: "Nenhum procedimento cadastrado." / com busca: "Nenhum procedimento encontrado.".
+- Erros: `ErroNomeDuplicado` → `{ ok: false, erros: { nome: "Já existe um procedimento com este nome." } }`; `ErroNaoEncontrado` → `notFound()`; qualquer outro é relançado.
+- `/procedimentos`: título "Procedimentos", botão "Novo procedimento", busca por nome via `?q=` (`servicos().procedimentos.listar(q)`), lista ordenada por nome; selo (Badge) **"sem descrição anestésica"**; vazio: "Nenhum procedimento cadastrado." / com busca: "Nenhum procedimento encontrado.".
 - `/procedimentos/novo`: campos "Nome do procedimento", "Descrição da técnica" (textarea), "Prescrição" (textarea, placeholder "Prescrito: …"); botão "Salvar".
 - `/procedimentos/[id]`: mesmo formulário preenchido + seção **"Descrição anestésica"** com select "ASA" (`OPCOES_ASA`) e textareas "Medicação pré-anestésica", "Indução", "Manutenção", "Bloqueio local", "Analgesia trans", "Antibiótico pré", "Pós imediato", "Observações" (placeholder "Sem intercorrências…"); botão "Salvar descrição anestésica". Botão "Excluir procedimento" (título "Excluir procedimento?", descrição "A descrição anestésica deste procedimento também será removida. Esta ação não pode ser desfeita."). Id inexistente → `notFound()`.
 - Toasts: "Procedimento salvo." / "Descrição anestésica salva.".
 
 - [ ] **Passo 1: Implementar** actions, páginas e formulários.
-- [ ] **Passo 2: Verificar manualmente** — criar procedimento (aparece com selo), nome duplicado mostra "Já existe um procedimento com este nome.", salvar descrição anestésica (selo some), campos opcionais vazios salvos como `null` (conferir com `npx prisma studio`), excluir remove ambos, `/procedimentos/xyz` mostra "Página não encontrada.".
+- [ ] **Passo 2: Verificar manualmente** — criar procedimento (aparece com selo), nome duplicado mostra "Já existe um procedimento com este nome.", salvar descrição anestésica (selo some), campos opcionais vazios voltam vazios ao recarregar a página, excluir remove ambos, `/procedimentos/xyz` mostra "Página não encontrada.".
 - [ ] **Passo 3: Rodar** `npm test && npm run lint && npm run typecheck && npm run build` → OK.
 - [ ] **Passo 4: Commit** — `T008: adiciona cadastro de procedimentos e descrição anestésica`.
 
@@ -442,7 +488,7 @@ export async function salvarDescricaoAnestesica(procedimentoId: string, estado: 
 - Test: `src/lib/preferencias.test.ts`
 
 **Interfaces:**
-- Consumes: `db` (T005); `gerarTextoCirurgico`, `gerarTextoAnestesico`, `DadosProcedimento`, `EntradaGeracao` (T002).
+- Consumes: `servicos()`, `ProcedimentoCompleto`, `Profissional` (T005); `gerarTextoCirurgico`, `gerarTextoAnestesico`, `DadosProcedimento`, `EntradaGeracao` (T002).
 - Produces:
 
 ```ts
@@ -458,7 +504,7 @@ export function BotaoCopiar(props: { texto: string; alvoRef: React.RefObject<HTM
 export function CartaoTexto(props: { titulo: string; texto: string | null }): JSX.Element; // texto null → estado vazio
 ```
 
-- `page.tsx` (Server Component): busca procedimentos **com** `descricaoAnestesica` (`where: { descricaoAnestesica: { isNot: null } }`, include, ordem por nome) e profissionais (ordem por nome), separa por papel, passa para `FormularioGerar`. Se não houver procedimento completo: "Nenhum procedimento completo. Cadastre um procedimento com descrição anestésica." com link para `/procedimentos`.
+- `page.tsx` (Server Component): busca `servicos().procedimentos.listarCompletos()` e `servicos().profissionais.listar()`, separa por papel, passa para `FormularioGerar`. Se não houver procedimento completo: "Nenhum procedimento completo. Cadastre um procedimento com descrição anestésica." com link para `/procedimentos`.
 - `FormularioGerar` (client): "Procedimento" (Combobox com busca: Popover + Command), "Cirurgião", "Anestesista" (selects com opção "Nenhum"), "Peso (kg)" (`inputMode="decimal"`, placeholder "ex.: 4,5"). Ao montar, aplica `resolverIdSalvo(lerPreferencia(...), ids)`; ao mudar profissional, `gravarPreferencia`. Monta `EntradaGeracao` a cada render.
 - Cartões **"Descrição Cirúrgica"** e **"Descrição Anestésica"**: lado a lado em `md:` e empilhados no celular; texto em `<pre>` com `whitespace-pre-wrap` e fonte legível; estado vazio "Selecione um procedimento para ver as descrições.".
 - `BotaoCopiar`: `navigator.clipboard.writeText`; sucesso → rótulo "Copiado ✓" por 2000 ms; falha → seleciona o conteúdo de `alvoRef` (Range/Selection) e toast "Use Ctrl+C para copiar.". Desabilitado quando não há texto.
@@ -474,13 +520,49 @@ it("lerPreferencia retorna null sem localStorage")  // ambiente node, sem global
 
 - [ ] **Passo 2: Rodar** → FAIL. **Passo 3: Implementar** `preferencias.ts`. **Passo 4: Rodar** → PASS.
 - [ ] **Passo 5: Implementar** página e componentes.
-- [ ] **Passo 6: Verificar manualmente** (com o seed): escolher procedimento, profissionais e peso → prévias corretas e atualizando ao digitar; "Copiar" de cada cartão cola só aquele texto num editor; recarregar mantém cirurgião/anestesista; excluir o cirurgião salvo e recarregar → seleção volta para "Nenhum" sem erro; layout empilha em 375 px.
+- [ ] **Passo 6: Verificar manualmente** (com `FONTE_DADOS=memoria` e os dados de demonstração): escolher procedimento, profissionais e peso → prévias corretas e atualizando ao digitar; "Copiar" de cada cartão cola só aquele texto num editor; recarregar mantém cirurgião/anestesista; excluir o cirurgião salvo e recarregar → seleção volta para "Nenhum" sem erro; layout empilha em 375 px.
 - [ ] **Passo 7: Rodar** `npm test && npm run lint && npm run typecheck && npm run build` → OK.
 - [ ] **Passo 8: Commit** — `T009: adiciona tela de geração com cópia dos textos`.
 
 ---
 
-### Task T010: Preparação do deploy
+### Task T010: Banco de dados e implementação Prisma dos serviços
+
+**Pré-requisitos (Líder):** (1) checkpoint de validação aprovado pelo usuário; (2) pedir ao usuário as URLs do Neon (`DATABASE_URL` pooled e `DIRECT_URL`) de um branch de desenvolvimento e gravá-las em `.env` local (não commitado).
+
+**Files:**
+- Create: `prisma/schema.prisma`, `prisma.config.ts`, `prisma/migrations/*`, `prisma/seed.ts`, `src/lib/db.ts`, `src/servicos/prisma/erros.ts`, `src/servicos/prisma/profissionais.ts`, `src/servicos/prisma/procedimentos.ts`, `src/servicos/prisma/index.ts`
+- Test: `src/servicos/prisma/erros.test.ts`
+- Modify: `src/servicos/index.ts` (ramo "prisma" → `servicosPrisma()`), `package.json` (scripts `postinstall: prisma generate`, `db:migrate: prisma migrate dev`, `db:seed: tsx prisma/seed.ts`), `.gitignore` (`src/generated/`)
+
+**Interfaces:**
+- Consumes: contratos, `ErroNomeDuplicado`, `ErroNaoEncontrado`, `DADOS_DEMONSTRACAO` (T005).
+- Produces:
+
+```ts
+// db.ts (import "server-only")
+export const db: PrismaClient; // singleton em globalThis no dev; adapter PrismaNeon({ connectionString: process.env.DATABASE_URL })
+// servicos/prisma/erros.ts
+export function traduzirErroPrisma(erro: unknown): unknown;
+  // { code: "P2002" } → new ErroNomeDuplicado(); { code: "P2025" } → new ErroNaoEncontrado(); outro → o próprio erro
+// servicos/prisma/index.ts
+export function servicosPrisma(): Servicos; // implementa exatamente o contrato de T005
+```
+
+Modelos: exatamente os da spec §5 (`Papel`, `Profissional`, `ProcedimentoCirurgico`, `DescricaoAnestesica`). Generator `prisma-client` com `output = "../src/generated/prisma"`. `prisma.config.ts` com `import "dotenv/config"`, schema `prisma/schema.prisma`, migrations `prisma/migrations`, `seed: "tsx prisma/seed.ts"` e datasource url `DIRECT_URL`. Mapeamento: `ProcedimentoCirurgico` → `Procedimento` (sem `createdAt`/`updatedAt`); busca com `contains` + `mode: "insensitive"`; `listarCompletos` com `where: { descricaoAnestesica: { isNot: null } }`; `excluir` com `deleteMany` (no-op se inexistente); `salvarDescricaoAnestesica` com `upsert` por `procedimentoId`, conferindo antes se o procedimento existe. Toda chamada ao Prisma envolta em `try/catch` → `throw traduzirErroPrisma(e)`.
+
+- [ ] **Passo 1: Teste (falhando)** — `traduzirErroPrisma({ code: "P2002" })` é `ErroNomeDuplicado`; `({ code: "P2025" })` é `ErroNaoEncontrado`; `new Error("x")` retorna o mesmo objeto.
+- [ ] **Passo 2: Rodar** → FAIL. **Passo 3: Implementar** (checagem pela forma do objeto, sem `instanceof` de classes Prisma). **Passo 4: Rodar** → PASS.
+- [ ] **Passo 5: Schema e migration** — `npm run db:migrate -- --name inicial` → migration criada e aplicada no branch de dev.
+- [ ] **Passo 6: `db.ts` e `servicos/prisma/*`** conforme Interfaces; ligar em `servicos/index.ts`.
+- [ ] **Passo 7: Seed** — idempotente a partir de `DADOS_DEMONSTRACAO` (`upsert` de procedimento por `nome`; profissional criado só se não existir com o mesmo nome). Rodar `npm run db:seed` duas vezes → sem duplicatas.
+- [ ] **Passo 8: Verificar manualmente** sem `FONTE_DADOS` no `.env`: repetir as verificações manuais de T007, T008 e T009 — mesmo comportamento observado com o mock, agora persistindo após reiniciar o servidor.
+- [ ] **Passo 9: Rodar** `npm test && npm run lint && npm run typecheck && npm run build` → OK.
+- [ ] **Passo 10: Commit** — `T010: adiciona banco Neon e implementação Prisma dos serviços`.
+
+---
+
+### Task T011: Preparação do deploy
 
 **Files:**
 - Modify: `package.json` (`"build": "prisma migrate deploy && next build"`)
@@ -490,8 +572,8 @@ it("lerPreferencia retorna null sem localStorage")  // ambiente node, sem global
 - Consumes: tudo das tasks anteriores.
 
 - [ ] **Passo 1: Script de build** conforme acima; confirmar que `postinstall` roda `prisma generate`.
-- [ ] **Passo 2: `README.md`** em pt-BR: o que é o app; rodar localmente (`npm install`, copiar `.env.example` para `.env`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`); comandos `lint`/`typecheck`/`test`; deploy (criar projeto no Neon, copiar URLs pooled e direta, importar repositório na Vercel, configurar as 4 variáveis de ambiente em Production e Preview, gerar `APP_SECRET` com `openssl rand -base64 32`; trocar `APP_PASSWORD` + `APP_SECRET` para revogar acessos); link para spec, `ARCHITECT.md` e `AGENTS.md`.
+- [ ] **Passo 2: `README.md`** em pt-BR: o que é o app; rodar localmente com mock (`FONTE_DADOS=memoria`, `npm run dev`) e com banco (sem `FONTE_DADOS`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`); comandos `lint`/`typecheck`/`test`; deploy (criar projeto no Neon, copiar URLs pooled e direta, importar repositório na Vercel, configurar `DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD` e `APP_SECRET` em Production e Preview — **sem** `FONTE_DADOS`, gerar `APP_SECRET` com `openssl rand -base64 32`; trocar `APP_PASSWORD` + `APP_SECRET` para revogar acessos); link para spec, `ARCHITECT.md` e `AGENTS.md`.
 - [ ] **Passo 3: Verificar** — `npm run build` com `.env` de dev aplica migrations (nenhuma pendente) e conclui; `npm start` serve o app e o fluxo login → gerar → copiar funciona.
-- [ ] **Passo 4: Commit** — `T010: prepara build e documentação de deploy`.
+- [ ] **Passo 4: Commit** — `T011: prepara build e documentação de deploy`.
 
 O deploy em si (conta Vercel, projeto Neon de produção, variáveis) é feito pelo usuário ou pelo papel **Verificador de deploy**, com aprovação do usuário.

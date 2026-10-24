@@ -33,6 +33,7 @@ Cálculo de doses, logins individuais, histórico de exportações, multi-clíni
 - UI: **Tailwind CSS + shadcn/ui**; `<html lang="pt-BR">`.
 - Validação: **Zod**, mesmos schemas no cliente e no servidor.
 - Geração de texto: **funções puras** executadas no cliente (prévia instantânea).
+- Acesso a dados: **camada de serviços** (`src/servicos/`) com duas implementações do mesmo contrato — **memória** (mock com dados de demonstração, para validar a experiência antes do banco) e **Prisma**. Páginas e actions nunca importam o Prisma diretamente. Ver §13.
 
 ## 5. Modelo de dados
 
@@ -185,8 +186,9 @@ Barra superior: **Gerar · Procedimentos · Profissionais · Sair**. Layout resp
   - Procedimento: `nome` obrigatório (1–150, trim), `descricaoTecnica` e `prescricao` obrigatórias (até 10 000).
   - Descrição anestésica: `asa` ∈ lista válida; demais campos opcionais (até 2 000); string vazia vira `null`.
 - Server Actions retornam `{ ok: true }` ou `{ ok: false, erros: Record<campo, string> }`; mensagens em pt-BR exibidas junto ao campo.
-- Prisma P2002 (nome de procedimento duplicado) → "Já existe um procedimento com este nome."
-- Registro inexistente (P2025) → página "não encontrado".
+- Serviço lança `ErroNomeDuplicado` (nome de procedimento duplicado) → action devolve "Já existe um procedimento com este nome." no campo `nome`.
+- Serviço lança `ErroNaoEncontrado` → página "não encontrado".
+- A implementação Prisma converte P2002 → `ErroNomeDuplicado` e P2025 → `ErroNaoEncontrado`; nenhum código Prisma vaza para fora de `src/servicos/prisma/`.
 - Erros inesperados → `error.tsx` com "Algo deu errado. Tente novamente."
 - Confirmação antes de excluir; excluir procedimento avisa que a descrição anestésica também será removida.
 
@@ -197,14 +199,17 @@ Barra superior: **Gerar · Procedimentos · Profissionais · Sair**. Layout resp
   - `gerarTextoCirurgico` / `gerarTextoAnestesico`: textos completos conforme os exemplos, omissão de campos vazios, `--` para peso/profissional ausentes, preservação de quebras de linha, trim.
   - Schemas Zod: casos válidos, inválidos e normalização (vazio → `null`).
   - `assinarToken` / `verificarToken`: válido, expirado, assinatura adulterada, segredo diferente.
+  - Implementação em memória dos serviços e `escolherFonte`: testes de contrato (§13).
+- A implementação Prisma não tem teste automatizado (seria integração); é verificada manualmente repetindo os fluxos validados com o mock.
 - Desenvolvimento em TDD para essas funções.
 
 ## 11. Deploy e ambiente
 
 - Neon: `DATABASE_URL` (pooled, runtime) e `DIRECT_URL` (direta, migrations).
 - Prisma Client gerado no install/build; `prisma migrate deploy` no build da Vercel.
-- `prisma/seed.ts` opcional com os dois exemplos fornecidos (OHE cadelas — cirúrgico; OHE eletiva felina — anestésico) como dados de demonstração.
-- `.env.example` documenta `DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD`, `APP_SECRET`.
+- `prisma/seed.ts` opcional, reaproveitando os mesmos dados de demonstração do mock em memória.
+- `.env.example` documenta `FONTE_DADOS`, `DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD`, `APP_SECRET`.
+- Em produção (Vercel) `FONTE_DADOS` **não** é definida (ou é diferente de `memoria`), então o app usa Prisma.
 - Versões: as estáveis mais recentes de Next.js, Prisma, Tailwind e shadcn/ui no momento da implementação; o plano de implementação fixa as versões e segue a documentação oficial de cada uma (ex.: nome do arquivo de proxy/middleware e configuração do Prisma variam entre versões principais).
 
 ## 12. Estrutura de pastas prevista
@@ -227,7 +232,68 @@ src/
     auth/               # assinarToken, verificarToken, sessão (+ testes)
     db.ts               # PrismaClient singleton
   actions/              # Server Actions por entidade
+  servicos/
+    tipos.ts            # contratos + tipos de domínio
+    erros.ts            # ErroNomeDuplicado, ErroNaoEncontrado
+    fonte.ts            # escolherFonte (+ teste)
+    memoria/            # mock em memória + dados de demonstração (+ testes de contrato)
+    prisma/             # implementação Prisma
+    index.ts            # servicos()
 prisma/
   schema.prisma
   seed.ts
 ```
+
+## 13. Camada de serviços
+
+Objetivo: validar a experiência completa (telas, fluxos, textos) com dados em memória **antes** de conectar ao Neon, e depois trocar para o banco sem tocar em páginas e actions.
+
+### Contrato
+
+```ts
+type Papel = "CIRURGIAO" | "ANESTESISTA";
+type Profissional = { id: string; nome: string; papel: Papel };
+type Procedimento = {
+  id: string; nome: string; descricaoTecnica: string; prescricao: string;
+  descricaoAnestesica: DadosDescricaoAnestesica | null;
+};
+type ProcedimentoCompleto = Procedimento & { descricaoAnestesica: DadosDescricaoAnestesica };
+type ProcedimentoResumo = { id: string; nome: string; temDescricaoAnestesica: boolean };
+
+interface ServicoProfissionais {
+  listar(): Promise<Profissional[]>;                                       // ordenado por nome (pt-BR)
+  criar(dados: DadosProfissional): Promise<Profissional>;
+  atualizar(id: string, dados: DadosProfissional): Promise<Profissional>;  // ErroNaoEncontrado
+  excluir(id: string): Promise<void>;                                      // id inexistente: no-op
+}
+
+interface ServicoProcedimentos {
+  listar(busca?: string): Promise<ProcedimentoResumo[]>;                   // busca por nome sem diferenciar maiúsculas; ordenado por nome
+  listarCompletos(): Promise<ProcedimentoCompleto[]>;                      // só com descrição anestésica
+  obter(id: string): Promise<Procedimento | null>;
+  criar(dados: DadosProcedimentoForm): Promise<Procedimento>;              // ErroNomeDuplicado
+  atualizar(id: string, dados: DadosProcedimentoForm): Promise<Procedimento>; // ErroNaoEncontrado | ErroNomeDuplicado
+  excluir(id: string): Promise<void>;                                      // remove a descrição anestésica junto; inexistente: no-op
+  salvarDescricaoAnestesica(procedimentoId: string, dados: DadosDescricaoAnestesicaForm): Promise<void>; // upsert; ErroNaoEncontrado
+}
+
+type Servicos = { profissionais: ServicoProfissionais; procedimentos: ServicoProcedimentos };
+```
+
+### Implementação em memória (mock)
+
+- Estado em `globalThis` (sobrevive ao hot reload do `next dev`); reinicia ao reiniciar o servidor.
+- Inicia com dados de demonstração: o procedimento "OVARIOHISTECTOMIA (DEMONSTRAÇÃO)" com os textos dos exemplos fornecidos, um procedimento de demonstração **sem** descrição anestésica (para exibir o selo) e um profissional de cada papel.
+- Retorna cópias (alterar um objeto retornado não altera o estado); ids via `crypto.randomUUID()`.
+- Mesmas regras do banco: nome de procedimento único (comparação exata após trim), cascata na exclusão.
+- Uso apenas local: em serverless (Vercel) cada instância teria memória própria.
+
+### Seleção da fonte
+
+- `FONTE_DADOS=memoria` (trim, sem diferenciar maiúsculas) → mock.
+- Qualquer outro valor ou ausente → Prisma. Produção nunca cai no mock por falta de configuração.
+- Antes de a implementação Prisma existir, a fonte Prisma lança "Fonte de dados não configurada. Defina FONTE_DADOS=memoria para usar dados de demonstração."
+
+### Checkpoint de validação
+
+Depois das telas prontas sobre o mock, o usuário valida a experiência localmente. Só então a implementação Prisma é construída.
