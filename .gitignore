@@ -14,3 +14,6 @@ npm-debug.log*
 /build
 /out/
 .neon
+
+# prisma
+/src/generated/

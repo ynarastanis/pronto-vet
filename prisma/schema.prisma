@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Papel {
+  CIRURGIAO
+  ANESTESISTA
+}
+
+model Profissional {
+  id        String   @id @default(cuid())
+  nome      String
+  papel     Papel
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProcedimentoCirurgico {
+  id                  String               @id @default(cuid())
+  nome                String               @unique
+  descricaoTecnica    String               @db.Text
+  prescricao          String               @db.Text
+  descricaoAnestesica DescricaoAnestesica?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model DescricaoAnestesica {
+  id             String                @id @default(cuid())
+  procedimentoId String                @unique
+  procedimento   ProcedimentoCirurgico @relation(fields: [procedimentoId], references: [id], onDelete: Cascade)
+  asa            String
+  mpa            String?               @db.Text
+  inducao        String?               @db.Text
+  manutencao     String?               @db.Text
+  bloqueioLocal  String?               @db.Text
+  analgesiaTrans String?               @db.Text
+  antibioticoPre String?               @db.Text
+  posImediato    String?               @db.Text
+  observacoes    String?               @db.Text
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+}
