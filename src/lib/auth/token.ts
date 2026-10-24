@@ -27,7 +27,8 @@ function deBase64Url(texto: string): Uint8Array<ArrayBuffer> | null {
     const binario = atob(preenchido);
     const bytes = new Uint8Array(binario.length);
     for (let i = 0; i < binario.length; i++) bytes[i] = binario.charCodeAt(i);
-    return bytes;
+    // Recusa base64url não canônico (bits finais ignorados pelo atob).
+    return paraBase64Url(bytes) === texto ? bytes : null;
   } catch {
     return null;
   }
@@ -39,6 +40,7 @@ export async function assinarToken(
   expiraEm: number,
 ): Promise<string> {
   if (!segredo) throw new Error("APP_SECRET não configurado");
+  if (!Number.isSafeInteger(expiraEm) || expiraEm <= 0) throw new Error("expiraEm inválido");
   const chave = await importarChave(segredo);
   const assinatura = await crypto.subtle.sign(
     "HMAC",
@@ -76,12 +78,12 @@ export async function verificarToken(
   }
 }
 
-/** Compara o SHA-256 das duas senhas em tempo constante. Esperada vazia/ausente: false. */
+/** Compara o SHA-256 das duas senhas em tempo constante. Esperada vazia, só com espaços ou ausente: false. */
 export async function senhaConfere(
   digitada: string,
   esperada: string | undefined,
 ): Promise<boolean> {
-  if (!esperada) return false;
+  if (!esperada?.trim()) return false;
   const [a, b] = await Promise.all([
     crypto.subtle.digest("SHA-256", codificador.encode(digitada)),
     crypto.subtle.digest("SHA-256", codificador.encode(esperada)),

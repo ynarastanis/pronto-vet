@@ -17,9 +17,20 @@ describe("token de sessão", () => {
 
   it("recusa assinatura adulterada", async () => {
     const token = await assinarToken(SEGREDO, 2000);
-    const ultimo = token.slice(-1);
-    const adulterado = token.slice(0, -1) + (ultimo === "A" ? "B" : "A");
+    const meio = 2 + 1 + 20; // dentro da assinatura (depois de "2000.")
+    const original = token[meio];
+    const adulterado = token.slice(0, meio) + (original === "A" ? "B" : "A") + token.slice(meio + 1);
     expect(await verificarToken(adulterado, SEGREDO, 1000)).toBe(false);
+  });
+
+  it("recusa base64url não canônico (último caractere com bits ignorados)", async () => {
+    const token = await assinarToken(SEGREDO, 2000);
+    const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    let aceitos = 0;
+    for (const c of alfabeto) {
+      if (await verificarToken(token.slice(0, -1) + c, SEGREDO, 1000)) aceitos++;
+    }
+    expect(aceitos).toBe(1);
   });
 
   it("recusa token assinado com outro segredo", async () => {
@@ -37,6 +48,12 @@ describe("token de sessão", () => {
     const token = await assinarToken(SEGREDO, 2000);
     const assinatura = token.split(".")[1];
     expect(await verificarToken(`9999.${assinatura}`, SEGREDO, 1000)).toBe(false);
+  });
+
+  it("assinarToken recusa expiraEm que não seja inteiro positivo", async () => {
+    for (const valor of [NaN, 1.5, 0, -1, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+      await expect(assinarToken(SEGREDO, valor)).rejects.toThrow("expiraEm inválido");
+    }
   });
 
   it("falha fechado sem segredo", async () => {
@@ -59,5 +76,10 @@ describe("senhaConfere", () => {
     expect(await senhaConfere("", undefined)).toBe(false);
     expect(await senhaConfere("", "")).toBe(false);
     expect(await senhaConfere("qualquer", undefined)).toBe(false);
+  });
+
+  it("trata APP_PASSWORD só com espaços como não configurada", async () => {
+    expect(await senhaConfere(" ", " ")).toBe(false);
+    expect(await senhaConfere("   ", "   ")).toBe(false);
   });
 });
