@@ -51,5 +51,5 @@ Next.js (App Router, Server Components + Server Actions), Prisma, Postgres (Neon
 
 - Este Next.js (16.x) tem mudanças incompatíveis com o que modelos conhecem: antes de escrever código, leia o guia relevante em `node_modules/next/dist/docs/` (App Router em `01-app/`).
 - `next dev` re-adiciona um bloco `nextjs-agent-rules` ao fim do `AGENTS.md`; não commitar essa alteração (`git checkout AGENTS.md`).
-- `next.config.ts` gerado habilita `cacheComponents` e `partialPrefetching`, com o loader `@tailwindcss/turbopack` para CSS.
+- `next.config.ts` não usa `cacheComponents` nem `partialPrefetching` (ADR-010); o loader `@tailwindcss/turbopack` trata o CSS. `error.tsx` e `global-error.tsx` usam `retry()` (ADR-011).
 - `src/lib/utils.ts` (`cn`) usa `clsx` + `tailwind-merge`; os componentes de `src/components/ui/` importam `cn` de `@/lib/utils`.
