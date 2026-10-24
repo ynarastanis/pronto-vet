@@ -86,5 +86,6 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
 - **Decisão:**
   1. O matcher do `src/proxy.ts` exclui apenas `_next/static/`, `_next/image` e uma lista explícita de arquivos estáticos de primeiro nível (`svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest`).
   2. Todas as páginas protegidas ficam no grupo de rotas `src/app/(app)/`, cujo `layout.tsx` chama `await exigirSessao()` e renderiza a barra de navegação. `/entrar` fica fora do grupo.
-  3. `exigirSessao()` é chamada fora de qualquer `try/catch` (o `redirect()` funciona lançando `NEXT_REDIRECT`).
-- **Consequências:** páginas protegidas ficam dinâmicas (coerente com ADR-010) e continuam protegidas mesmo se o matcher falhar. Rotas das T007–T009 passam a viver em `src/app/(app)/` (URLs inalteradas).
+  3. **Cada `page.tsx` protegida chama `await exigirSessao()` na primeira linha**, antes de ler qualquer dado. (Revisão da T006, rodada 2: layouts não re-renderizam em navegação no cliente — uma requisição RSC sem cookie com o layout `(app)` já montado recebeu 200 com o conteúdo da página, e o código da página roda mesmo quando o layout redireciona; ver `node_modules/next/dist/docs/01-app/02-guides/authentication.md`.)
+  4. `exigirSessao()` é chamada fora de qualquer `try/catch` (o `redirect()` funciona lançando `NEXT_REDIRECT`).
+- **Consequências:** camadas reais: proxy (todas as requisições) + `exigirSessao()` em cada página e em cada Server Action. O layout do grupo só garante a verificação no carregamento completo e torna as páginas dinâmicas (coerente com ADR-010); **não** é uma camada de proteção por si só. Rotas das T007–T009 vivem em `src/app/(app)/` (URLs inalteradas).

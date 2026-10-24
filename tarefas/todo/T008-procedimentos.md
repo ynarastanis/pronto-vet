@@ -20,7 +20,7 @@ Lista com busca e selo, criação, edição, exclusão e descrição anestésica
 
 ## Notas do Líder
 
-- ADR-012: páginas em `src/app/(app)/`; `exigirSessao()` é a primeira linha de cada action e fica **fora** de qualquer `try/catch` (o `redirect()` lança `NEXT_REDIRECT`).
+- ADR-012: páginas em `src/app/(app)/`; `await exigirSessao()` é a **primeira linha de cada `page.tsx` e de cada action**, antes de ler dados, e fica **fora** de qualquer `try/catch` (o `redirect()` lança `NEXT_REDIRECT`). O layout do grupo sozinho **não** protege navegações no cliente.
 
 Pode rodar em paralelo com T007.
 

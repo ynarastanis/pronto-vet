@@ -21,7 +21,7 @@
 - Nenhum dado de paciente persistido; peso só existe no estado do cliente.
 - Variáveis de ambiente: `FONTE_DADOS` (`memoria` no dev até T010), `DATABASE_URL` (pooled), `DIRECT_URL` (direta), `APP_PASSWORD`, `APP_SECRET`.
 - Páginas, actions e componentes acessam dados **apenas** via `servicos()`; nunca importam Prisma nem `src/lib/db.ts`.
-- Páginas protegidas vivem em `src/app/(app)/` (layout com `exigirSessao()`, ADR-012). `exigirSessao()` nunca dentro de `try/catch`.
+- Páginas protegidas vivem em `src/app/(app)/` e **toda `page.tsx` protegida e toda Server Action chamam `await exigirSessao()` na primeira linha** (ADR-012; o layout do grupo sozinho não protege). `exigirSessao()` nunca dentro de `try/catch`.
 
 ## Foco de revisão
 
@@ -386,7 +386,8 @@ it("dados de demonstração têm um procedimento completo e um incompleto") // c
 ### Task T006: Login, proxy e navegação
 
 **Files:**
-- Create: `src/lib/auth/sessao.ts`, `src/proxy.ts`, `src/actions/auth.ts`, `src/app/entrar/page.tsx`, `src/components/entrar/formulario-entrar.tsx`, `src/components/barra-navegacao.tsx`
+- Create: `src/lib/auth/sessao.ts`, `src/proxy.ts`, `src/actions/auth.ts`, `src/app/entrar/page.tsx`, `src/components/entrar/formulario-entrar.tsx`, `src/components/barra-navegacao.tsx`, `src/app/(app)/layout.tsx`
+- Move: `src/app/page.tsx` → `src/app/(app)/page.tsx`
 - Modify: `src/app/layout.tsx`
 
 **Interfaces:**
@@ -397,16 +398,16 @@ it("dados de demonstração têm um procedimento completo e um incompleto") // c
 // sessao.ts (import "server-only")
 export async function criarSessao(): Promise<void>;   // cookie httpOnly, secure em produção, sameSite "lax", path "/", maxAge 30 dias
 export async function encerrarSessao(): Promise<void>;
-export async function exigirSessao(): Promise<void>;  // sessão inválida → redirect("/entrar"); primeira linha de TODA Server Action
+export async function exigirSessao(): Promise<void>;  // sessão inválida → redirect("/entrar"); primeira linha de TODA Server Action e TODA page.tsx protegida
 // actions/auth.ts ("use server")
 export async function entrar(estado: ResultadoAcao, formData: FormData): Promise<ResultadoAcao>;
   // senha errada → espera 1000 ms → { ok: false, erros: { senha: "Senha incorreta." } }; certa → criarSessao(); redirect("/")
 export async function sair(): Promise<void>; // encerrarSessao(); redirect("/entrar")
 ```
 
-- `src/proxy.ts`: exporta `proxy(request)` e `config.matcher` excluindo `_next/static`, `_next/image`, `favicon.ico` e arquivos com extensão. Sem token válido e rota ≠ `/entrar` → redirect `/entrar`. Com token válido em `/entrar` → redirect `/`.
+- `src/proxy.ts`: exporta `proxy(request)` e `config.matcher` excluindo apenas `_next/static/`, `_next/image` e uma lista explícita de arquivos estáticos de primeiro nível (ADR-012). Sem token válido e rota ≠ `/entrar` → redirect `/entrar`. Com token válido em `/entrar` → redirect `/`.
 - `/entrar`: card centralizado "Pronto Vet", campo "Senha" (`type="password"`, `autoFocus`), botão "Entrar" (desabilitado com "Entrando…" durante o envio), erro abaixo do campo.
-- Barra (renderizada no layout fora de `/entrar`): links **Gerar** (`/`), **Procedimentos**, **Profissionais**, link ativo destacado; botão **Sair** (form com action `sair`). Responsiva.
+- Barra (renderizada pelo `src/app/(app)/layout.tsx`, que também chama `exigirSessao()`): links **Gerar** (`/`), **Procedimentos**, **Profissionais**, link ativo destacado; botão **Sair** (form com action `sair`). Responsiva.
 
 - [ ] **Passo 1: Implementar** `sessao.ts`, `proxy.ts`, `actions/auth.ts`, página e barra.
 - [ ] **Passo 2: Verificar manualmente** com `.env` contendo `APP_PASSWORD` e `APP_SECRET`, `npm run dev`:
