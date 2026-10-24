@@ -6,3 +6,10 @@ node_modules/
 coverage/
 *.tsbuildinfo
 next-env.d.ts
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+/build
+/out/

@@ -46,3 +46,10 @@ Next.js (App Router, Server Components + Server Actions), Prisma, Postgres (Neon
 ## Segredos e ambiente
 
 `FONTE_DADOS`, `DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD`, `APP_SECRET` — apenas via variáveis de ambiente. Desenvolvimento local usa `FONTE_DADOS=memoria` até a implementação Prisma existir; produção nunca define `memoria`.
+
+## Notas do Next.js
+
+- Este Next.js (16.x) tem mudanças incompatíveis com o que modelos conhecem: antes de escrever código, leia o guia relevante em `node_modules/next/dist/docs/` (App Router em `01-app/`).
+- `next dev` re-adiciona um bloco `nextjs-agent-rules` ao fim do `AGENTS.md`; não commitar essa alteração (`git checkout AGENTS.md`).
+- `next.config.ts` gerado habilita `cacheComponents` e `partialPrefetching`, com o loader `@tailwindcss/turbopack` para CSS.
+- `src/lib/utils.ts` (`cn`) usa `clsx` + `tailwind-merge`; os componentes de `src/components/ui/` importam `cn` de `@/lib/utils`.
