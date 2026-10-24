@@ -358,11 +358,11 @@
 }
 .cadeado .cadeado-haste {
   transform-box: view-box;
-  transform-origin: 7px 11px;
+  transform-origin: 7px 13px;
   transition: transform 220ms var(--curva);
 }
 .cadeado[data-aberto="true"] .cadeado-haste {
-  transform: translateY(-3px) rotate(-25deg);
+  transform: translateY(-1px) rotate(-25deg);
 }
 .cadeado .cadeado-corpo {
   transform-box: fill-box;
