@@ -130,3 +130,14 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
 | `FONTE_DADOS` | não definir | não definir | — |
 
 - **Consequências:** todo código chega ao `main` por PR com CI verde e preview conferível. Até a T010, deploys da Vercel sobem sem banco (páginas com dados falham em runtime) — esperado.
+
+## ADR-016 — Prisma 7.10.1 com adapter Neon, ordenação/busca em JS e scripts de banco
+
+- **Status:** aceita (2026-10-24), registrada pelo Implementador da T010 por pedido do Líder.
+- **Contexto:** a tag `latest` do `prisma` é a 8.0 rc; o banco `development` do Neon usa `lc_collate = C.UTF-8` (ordena por bytes) e `ILIKE` não ignora maiúsculas acentuadas nesse ctype.
+- **Decisão:**
+  1. `prisma`, `@prisma/client` e `@prisma/adapter-neon` fixos em 7.10.1 (`@neondatabase/serverless` 1.2.0 vem como dependência do adapter). Generator `prisma-client` em `src/generated/prisma` (ignorado no git e no ESLint), gerado no `postinstall`.
+  2. `tsx` e `dotenv` entram como `devDependencies` (seed e `prisma.config.ts` carregam `.env.local`); o seed roda com `--conditions=react-server` para que `import "server-only"` de `src/lib/db.ts` não lance fora do Next.
+  3. Listagem e busca de procedimentos e ordenação de profissionais são feitas em JS com `compararNomes` e `nomeContemTermo` (`src/servicos/nomes.ts`), compartilhadas com a memória: paridade exata de ordem pt-BR e de busca (acentos, maiúsculas, `%` e `_` literais) independentemente da collation do banco. O volume é pequeno.
+  4. `build` continua `next build` (a CI não tem banco); `vercel-build` = `prisma generate && prisma migrate deploy && next build`. O seed é só local (`npm run db:seed`).
+- **Consequências:** nenhuma dependência de runtime fora da stack além do adapter Neon; trocar de collation ou de banco não muda o comportamento observável.
