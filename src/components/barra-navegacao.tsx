@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { sair } from "@/actions/auth";
 import { cn } from "@/lib/utils";
@@ -49,22 +50,30 @@ export function BarraNavegacao() {
     posicionar();
     const observador = new ResizeObserver(posicionar);
     observador.observe(raiz);
-    return () => observador.disconnect();
+    raiz.querySelectorAll("a").forEach((a) => observador.observe(a));
+    // A Onest troca a fonte reserva depois do primeiro desenho; recalcula quando carregar.
+    let cancelado = false;
+    document.fonts?.ready.then(() => {
+      if (!cancelado) posicionar();
+    });
+    return () => {
+      cancelado = true;
+      observador.disconnect();
+    };
   }, [caminho]);
 
   return (
     <header className="sticky top-0 z-30 h-14 border-b bg-card">
       <nav
         aria-label="Principal"
-        className="mx-auto flex h-full max-w-[1120px] items-center gap-3 px-4 md:gap-6 md:px-6"
+        className="mx-auto flex h-full max-w-[1120px] items-center gap-2 px-4 sm:gap-3 md:gap-6 md:px-6"
       >
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 rounded-md font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+          className="hidden shrink-0 items-center gap-2 rounded-md font-semibold sm:flex outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
         >
           <span aria-hidden className="size-4 rounded-[3px] bg-primary" />
-          <span className="hidden text-base sm:inline">Pronto Vet</span>
-          <span className="sr-only sm:hidden">Pronto Vet</span>
+          <span className="text-base">Pronto Vet</span>
         </Link>
 
         <div
@@ -80,7 +89,7 @@ export function BarraNavegacao() {
                 href={href}
                 aria-current={ativo ? "page" : undefined}
                 className={cn(
-                  "relative flex h-10 shrink-0 items-center rounded-lg px-2.5 text-sm transition-colors duration-[180ms] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card md:px-3",
+                  "relative flex h-10 shrink-0 items-center rounded-lg px-2 text-[13px] transition-colors duration-[180ms] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:px-2.5 sm:text-sm md:px-3",
                   ativo
                     ? "font-medium text-primary"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -95,9 +104,11 @@ export function BarraNavegacao() {
         <form action={sair} className="shrink-0">
           <button
             type="submit"
-            className="flex h-10 items-center rounded-lg px-2.5 text-sm text-muted-foreground transition-colors duration-[180ms] outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            aria-label="Sair"
+            className="flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg text-sm text-muted-foreground sm:px-2.5 transition-colors duration-[180ms] outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
-            Sair
+            <LogOut aria-hidden className="size-4 sm:hidden" />
+            <span className="hidden sm:inline">Sair</span>
           </button>
         </form>
       </nav>
