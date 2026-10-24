@@ -92,10 +92,10 @@ Sem animação automática na carga das páginas além do fade de 160ms. Sem hov
 | Onde | Ícone |
 |---|---|
 | Link Gerar | `ClipboardList` |
-| Link Procedimentos | `Scissors` |
+| Link Procedimentos | `IconeMascara` (próprio) |
 | Link Profissionais | `Users` |
 | Sair | `LogOut` |
-| Campo Procedimento / combobox | `Scissors` + `ChevronsUpDown` |
+| Campo Procedimento / combobox | `IconeMascara` + `ChevronsUpDown` |
 | Campo Cirurgião | `UserRound` |
 | Campo Anestesista | `Syringe` |
 | Campo Peso | `Weight` |
@@ -105,13 +105,15 @@ Sem animação automática na carga das páginas além do fade de 160ms. Sem hov
 | Salvar | `Save` (ou `Check` em salvamento inline) |
 | Excluir | `Trash2` |
 | Copiar / Copiado | `Copy` / `Check` |
-| Ficha cirúrgica | `Scissors` |
+| Ficha cirúrgica | `IconeMascara` |
 | Ficha anestésica | `Syringe` |
 | Selo "sem descrição anestésica" | `CircleAlert` |
 | Estado vazio de procedimentos | `FileText` |
 | Estado vazio de profissionais | `Users` |
 | Página não encontrada / erro | `SearchX` / `TriangleAlert` |
 | Login | `KeyRound` no campo Senha |
+
+**Ícone de procedimento:** `src/components/icone-mascara.tsx` — máscara cirúrgica desenhada no estilo lucide (viewBox 24, traço 1.75, `currentColor`, cantos arredondados), substitui a tesoura (que não comunicava "procedimento"; a lucide não tem máscara cirúrgica). Corpo com 2 pregas horizontais e alças laterais.
 
 ## Edição livre do texto gerado (cadeado)
 
