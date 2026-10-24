@@ -21,6 +21,14 @@ Criar o app Next.js 16 com Tailwind, shadcn/ui, Vitest, scripts de qualidade, la
 
 ## Notas do Líder
 
+**Decisões da rodada 1 (para a rodada 2):**
+1. Bloqueante aceito: `error.tsx` usa `retry()` (ADR-011).
+2. Remover `cacheComponents` e `partialPrefetching` do `next.config.ts` (ADR-010); atualizar a nota correspondente em `CLAUDE.md` › "Notas do Next.js".
+3. Traduzir para pt-BR os textos visíveis/lidos por leitor de tela em `src/components/ui/` ("Command Palette" → "Paleta de comandos", "Search for a command to run..." → "Busque um comando...", "Close" → "Fechar", e quaisquer outros em inglês).
+4. Criar `src/app/global-error.tsx` em pt-BR (com `<html lang="pt-BR"><body>`), mesmo texto do `error.tsx`.
+5. `error.tsx` e `global-error.tsx` usam o `Button` do shadcn.
+6. Mover `shadcn` para `devDependencies`.
+
 Atenção: create-next-app 16 gera AGENTS.md/CLAUDE.md próprios — mesclar notas úteis, nunca substituir os nossos.
 
 ---

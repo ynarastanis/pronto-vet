@@ -64,3 +64,17 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
 - **Contexto:** o usuário quer validar a experiência (telas, fluxos, textos gerados) antes de conectar ao Neon.
 - **Decisão:** contratos `ServicoProfissionais` e `ServicoProcedimentos` em `src/servicos/tipos.ts`, com implementação em memória (dados de demonstração) e, depois do checkpoint de validação, implementação Prisma. Páginas e actions acessam dados apenas via `servicos()`. Erros de domínio (`ErroNomeDuplicado`, `ErroNaoEncontrado`) substituem códigos do Prisma fora de `src/servicos/prisma/`. `FONTE_DADOS=memoria` ativa o mock; qualquer outro valor ou ausência usa Prisma (falha segura em produção).
 - **Consequências:** Prisma fica isolado e trocável; a implementação em memória ganha testes de contrato. O mock só é confiável localmente (memória por instância em serverless). Complementa ADR-002; o mapeamento de erros sai das actions e vai para a implementação Prisma.
+
+## ADR-010 — Sem Cache Components (renderização dinâmica padrão)
+
+- **Status:** aceita (2026-10-24)
+- **Contexto:** o `create-next-app` 16.4 habilita `cacheComponents` e `partialPrefetching` no `next.config.ts`. Todas as páginas do app ficam atrás de login (leem cookie) e mostram dados que mudam a cada edição; com Cache Components, cada leitura dinâmica exige `Suspense` ou `"use cache"`, o que adiciona complexidade sem ganho para uma equipe pequena.
+- **Decisão:** remover `cacheComponents` e `partialPrefetching` do `next.config.ts`. Páginas renderizam dinamicamente; após escritas, as Server Actions chamam `revalidatePath`.
+- **Consequências:** modelo mental mais simples para T006–T009. Se performance virar problema, reavaliar com nova ADR.
+
+## ADR-011 — `retry()` em vez de `reset()` no `error.tsx`
+
+- **Status:** aceita (2026-10-24)
+- **Contexto:** no Next 16.3+, `reset()` só re-renderiza o segmento no cliente; não busca de novo os dados do Server Component. Uma falha transitória (ex.: banco) voltaria a mostrar o erro.
+- **Decisão:** `error.tsx` usa `retry()`. O plano (T001) citava `reset()`; esta ADR o substitui.
+- **Consequências:** "Tentar novamente" realmente refaz a requisição.
