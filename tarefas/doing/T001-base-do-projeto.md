@@ -1,6 +1,6 @@
 # T001 — Base do projeto
 
-- **Status:** em revisão
+- **Status:** implementando
 - **Prioridade:** P1
 - **Depende de:** nenhuma
 - **Referência na spec:** §4, §11, §12
@@ -47,6 +47,13 @@ curl localhost:3000 (next dev) -> <h1>Gerar</h1>, <html lang="pt-BR">; /nao-exis
 <!-- preenchido pelo Revisor (Opus, sessão limpa) -->
 
 - **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [x] `arquivo:linha` — …
+- **Veredito:** alterações solicitadas
+- **Verificação do Revisor:** `npm run lint` (exit 0), `npm run typecheck` (exit 0), `npm test` (1 arquivo, 1 teste passando), `npm run build` (Next.js 16.4.3, rotas `/` e `/_not-found` estáticas; CSS gerado contém as utilities do Tailwind). `AGENTS.md`, `ARCHITECT.md`, `docs/`, `tarefas/` e `.claude/` intactos no commit; `CLAUDE.md` só recebeu a seção "Notas do Next.js". Nenhum `import ... from "cn"` restante.
+- **Apontamentos bloqueantes:**
+  - [ ] `src/app/error.tsx:3` e `:7` — o botão "Tentar novamente" chama `reset()`. No Next 16.4 (`node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/error.md`, seções `retry`/`reset`), `reset()` só limpa o estado e re-renderiza **sem re-buscar** o conteúdo; para erros de Server Component (o caso típico deste app: falha transitória no Neon) o botão reexibe o mesmo erro. A doc recomenda `retry()` (estável desde 16.3). O plano pedia `reset()`, mas foi escrito antes dessa mudança — e o próprio `CLAUDE.md` manda seguir a doc local. — Trocar para `({ retry }: { error: unknown; retry: () => void })` e `onClick={() => retry()}`; registrar o desvio do plano no resumo da implementação.
+- **Sugestões (não bloqueantes):**
+  - [ ] `src/components/ui/command.tsx:37-38` e `src/components/ui/dialog.tsx:75` — textos padrão em inglês lidos por leitor de tela ("Command Palette", "Search for a command to run...", "Close"). — Traduzir ("Paleta de comandos", "Buscar…", "Fechar") agora ou na tarefa que primeiro usar esses componentes (T008/T009).
+  - [ ] `src/app/` — sem `global-error.tsx`: erro no layout raiz cai na página 500 padrão, em inglês. — Avaliar com o Líder se cabe uma tarefa curta (fora do plano atual; YAGNI até lá).
+  - [ ] `next.config.ts:5` — `cacheComponents: true` muda a semântica de leitura dinâmica (cookies da sessão, dados por request exigem `<Suspense>`/`connection()`), o que afeta T006–T009. — Registrar como ADR em `ARCHITECT.md` ou alertar nas tarefas seguintes; hoje só consta em `CLAUDE.md`.
+  - [ ] `package.json:24` — `shadcn` está em `dependencies` (só é usado pelo `@import "shadcn/tailwind.css"` no build). — Mover para `devDependencies` é opcional; não afeta a Vercel.
+  - [ ] `src/app/error.tsx:7` — botão HTML cru em vez de `Button` de `@/components/ui/button`. — Usar o componente para manter o visual consistente.
