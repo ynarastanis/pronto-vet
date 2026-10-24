@@ -35,6 +35,23 @@ Verde **cirúrgico** (verde-azulado dos campos operatórios), não o esmeralda p
 - Escala (px): 13 · 14 (base da UI) · 16 · 20 · 26. Títulos de página 26/600 com `letter-spacing: -0.01em`; títulos de seção 16/600.
 - Sem caixa-alta em rótulos de interface (os rótulos em maiúsculas que aparecem **dentro** do texto gerado são conteúdo e ficam como estão). Sem sobretítulos acima de títulos. Sem acentuar uma palavra isolada de um título.
 
+## Escala em telas grandes
+
+Pedido do usuário (2026-10-24): em notebook e monitores o app ficava pequeno; com zoom de 150% ficava bom. Em vez de exigir zoom, a **escala global cresce com a largura da tela** a partir de 1024px:
+
+```css
+html { font-size: 100%; }                         /* < 1024px: celular e tablet inalterados */
+@media (min-width: 1024px) {
+  html { font-size: clamp(16px, 1.778px + 1.389vw, 24px); }
+}
+/* 1024px → 16px (100%) · 1280px → ~19.6px (122%) · 1366px → ~20.8px (130%) · 1536px → ~23.1px (144%) · ≥1600px → 24px (150%) */
+```
+
+- Funciona porque tipografia, espaçamentos e raios são em `rem`. **Valores em `px` não escalam**: tamanhos de texto, larguras máximas, alturas fixas, faixas e ícones devem ser expressos em `rem` (16px = 1rem na base). Exceções que ficam em `px`: bordas de 1px, anéis de foco, deslocamentos de animação.
+- A largura máxima do conteúdo passa de 1120px para `70rem`, crescendo junto.
+- Breakpoints de mídia continuam em pixels de viewport (media queries em `rem` usam o tamanho padrão do navegador, não o `html`), então a troca de layout não muda.
+- Não usar a propriedade CSS `zoom`: desalinha popovers e combobox posicionados por coordenadas.
+
 ## Layout
 
 Conteúdo alinhado à esquerda; largura máxima 1120px; gutter 16px no celular, 24px no desktop.
