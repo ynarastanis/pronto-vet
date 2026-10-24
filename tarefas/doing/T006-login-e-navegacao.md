@@ -1,6 +1,6 @@
 # T006 — Login, proxy e barra de navegação
 
-- **Status:** em revisão
+- **Status:** implementando
 - **Prioridade:** P1
 - **Depende de:** T003, T004 (pode rodar em paralelo com T005)
 - **Referência na spec:** §7, §8
@@ -18,6 +18,12 @@ Página /entrar, actions entrar/sair, exigirSessao, proxy.ts protegendo as rotas
 - [x] `npm run lint`, `npm run typecheck` e `npm test` passando
 
 ## Notas do Líder
+
+**Decisões da rodada 1 (para a rodada 2) — ver ADR-012:**
+1. Bloqueante 1: trocar o matcher pela lista explícita proposta pelo Revisor e reexecutar os cenários do Revisor (`/x.y`, `/procedimentos/a.b`, `/index.rsc` → 307 sem cookie; `/favicon.ico`, `/file.svg`, `_next/static` → 200).
+2. Bloqueante 2: corrigir/remover o comentário errado do matcher.
+3. Criar o grupo `src/app/(app)/` com `layout.tsx` que faz `await exigirSessao()` e renderiza a `BarraNavegacao`; mover `src/app/page.tsx` para `src/app/(app)/page.tsx`. O `src/app/layout.tsx` raiz deixa de renderizar a barra. `/entrar` e `not-found` ficam fora do grupo (sem barra para quem não tem sessão).
+4. Comentário de uma linha em `exigirSessao` avisando que não pode ficar dentro de `try/catch`.
 
 - Herdado da revisão da T004: tratar `APP_SECRET` só com espaços como não configurado (simetria com `APP_PASSWORD`). Ajustar `assinarToken`/`verificarToken` em `src/lib/auth/token.ts` para `!segredo?.trim()`, com teste (TDD).
 
@@ -53,6 +59,15 @@ npm run build      -> Compiled successfully; rotas /, /_not-found, /entrar; "ƒ 
 <!-- preenchido pelo Revisor (Opus, sessão limpa) -->
 
 - **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [x] `arquivo:linha` — …
+- **Veredito:** alterações solicitadas
+- **Verificação do Revisor:** `npm run lint`, `npm run typecheck` e `npm test` (7 arquivos, 55 testes) passando. `next dev` com `.env.local` de teste (ignorado pelo git, removido ao final) e `next build && next start` numa cópia isolada, exercitados com curl. Matcher compilado com o próprio `getMiddlewareMatchers` do Next 16.4.3 para cada variante.
+  - Confirmado: `/` e `/procedimentos` sem cookie → 307 `/entrar`; senha errada e vazia → "Senha incorreta." em ~1,06–1,13 s; senha certa → 303 `/` (Location fixo, sem parâmetro de destino: sem open redirect); cookie `sessao` com HttpOnly, SameSite=lax, Path=/, Max-Age=2592000; `/entrar` com cookie → 307 `/`; expiração ou assinatura adulteradas → 307 `/entrar`; Sair → `sessao=; Path=/; Expires=1970` e 303 `/entrar`, depois `/` → 307; `APP_PASSWORD` vazia → nem senha vazia nem espaço entram, mesma mensagem e mesmo atraso (sem vazar se a senha está configurada).
+  - Confirmado: Server Action executa em caminho que o proxy pula (POST da action `sair` em `/x.y` → 303), o que reforça `exigirSessao()` em toda action.
+- **Apontamentos bloqueantes:**
+  - [ ] `src/proxy.ts:19-21` — o matcher exclui **qualquer** caminho com ponto (`.*[.].*`), o que contraria a spec §8 ("protege todas as rotas, exceto `/entrar` e assets estáticos"). Ficam fora do proxy: `/procedimentos/a.b` (rota dinâmica `[id]` da T008 com id contendo ponto), qualquer página futura numa URL com ponto, POSTs de Server Actions nesses caminhos e as formas de transporte que o Next acrescenta de propósito ao matcher (`/index.rsc`, `/procedimentos.rsc`, `…/.segments/….segment.rsc`; ver a regexp gerada). Localmente `next dev`/`next start` respondem 404 a essas formas `.rsc`, então não reproduzi vazamento de conteúdo; mas a própria build marca `/` como estática (○), e páginas sem API dinâmica serão pré-renderizadas e ficarão protegidas só pelo proxy, então o comportamento do host (Vercel) para esses arquivos não pode ficar descoberto. — Trocar por lista explícita de arquivos estáticos de primeiro nível, mantendo `\\.` como na doc: `"/((?!_next/static/|_next/image$|favicon\\.ico$|[^/]+\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest)$).*)"`. Testei esse matcher numa cópia isolada com `next build && next start`: `/x.y`, `/procedimentos/a.b` e `/index.rsc` sem cookie → 307 `/entrar`; `/favicon.ico`, `/file.svg` e os chunks de `/_next/static/` → 200; login e `/` com cookie funcionam.
+  - [ ] `src/proxy.ts:19` — o comentário está errado e vai induzir a próxima pessoa a erro: o path-to-regexp não descarta a barra. Em TS, `"\."` vira `"."` antes de chegar ao Next (é o JS que descarta o escape); `"\\."`, como na doc (`node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md:94`), gera exatamente a mesma regexp que `[.]`. Conferido com `getMiddlewareMatchers`. — Remover o comentário (ou corrigi-lo) junto com a troca do matcher.
+- **Sugestões (não bloqueantes):**
+  - [ ] `src/components/barra-navegacao.tsx:17` — a barra (com Gerar/Procedimentos/Profissionais/Sair) aparece na página 404 para quem não tem sessão (ex.: `/x.y` hoje). Com o matcher corrigido isso quase some (só sobra em caminhos de arquivo estático inexistente). Opcional: aceitar como está.
+  - [ ] Defesa em profundidade nas páginas (decisão do Líder, fora do plano atual): mover as páginas protegidas para um grupo `src/app/(app)/` com `layout.tsx` que chama `await exigirSessao()` (deixando `/entrar` fora do grupo para não criar loop). Isso também torna as páginas dinâmicas, coerente com a ADR-010, e evita que uma página com dados seja pré-renderizada como estática. Se adotado, registrar no plano/ARCHITECT.md.
+  - [ ] Nota para T007/T008: `exigirSessao()` funciona como primeira linha (assinatura `Promise<void>`, `import "server-only"`, redireciona via `redirect()`), mas precisa ficar **fora** de qualquer `try/catch`, porque `redirect()` lança `NEXT_REDIRECT`; um `catch` genérico engoliria o redirect e deixaria a action seguir sem sessão.
+  - Conferidos sem ressalva: `token.ts` com `!segredo?.trim()` e teste novo (item herdado da T004); `secure` por `NODE_ENV === "production"` (vale também em Preview na Vercel); `sair` sem exigir sessão é inofensivo; `APP_SECRET` ausente com senha certa → `criarSessao` lança e cai no `error.tsx` (falha fechada).

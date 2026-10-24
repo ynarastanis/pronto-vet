@@ -19,6 +19,8 @@ Página /profissionais com adicionar, editar e excluir, em duas colunas por pape
 
 ## Notas do Líder
 
+- ADR-012: páginas em `src/app/(app)/`; `exigirSessao()` é a primeira linha de cada action e fica **fora** de qualquer `try/catch` (o `redirect()` lança `NEXT_REDIRECT`).
+
 Pode rodar em paralelo com T008. Quem chegar primeiro cria src/components/confirmar-exclusao.tsx.
 
 ---

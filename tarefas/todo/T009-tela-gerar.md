@@ -21,6 +21,8 @@ Tela principal: escolher procedimento, profissionais e peso; prévias dos dois t
 
 ## Notas do Líder
 
+- ADR-012: páginas em `src/app/(app)/`; `exigirSessao()` é a primeira linha de cada action e fica **fora** de qualquer `try/catch` (o `redirect()` lança `NEXT_REDIRECT`).
+
 
 
 ---

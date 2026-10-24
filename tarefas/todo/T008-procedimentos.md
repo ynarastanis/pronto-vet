@@ -20,6 +20,8 @@ Lista com busca e selo, criação, edição, exclusão e descrição anestésica
 
 ## Notas do Líder
 
+- ADR-012: páginas em `src/app/(app)/`; `exigirSessao()` é a primeira linha de cada action e fica **fora** de qualquer `try/catch` (o `redirect()` lança `NEXT_REDIRECT`).
+
 Pode rodar em paralelo com T007.
 
 ---

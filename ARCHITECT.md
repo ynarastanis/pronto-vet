@@ -78,3 +78,13 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
 - **Contexto:** no Next 16.3+, `reset()` só re-renderiza o segmento no cliente; não busca de novo os dados do Server Component. Uma falha transitória (ex.: banco) voltaria a mostrar o erro.
 - **Decisão:** `error.tsx` usa `retry()`. O plano (T001) citava `reset()`; esta ADR o substitui.
 - **Consequências:** "Tentar novamente" realmente refaz a requisição.
+
+## ADR-012 — Proteção de páginas em duas camadas: proxy + layout do grupo `(app)`
+
+- **Status:** aceita (2026-10-24)
+- **Contexto:** a revisão da T006 mostrou que um matcher do proxy permissivo demais (excluir todo caminho com ponto) deixa páginas, formas `.rsc` e POSTs de Server Actions sem verificação. Páginas sem API dinâmica seriam pré-renderizadas e protegidas só pelo proxy.
+- **Decisão:**
+  1. O matcher do `src/proxy.ts` exclui apenas `_next/static/`, `_next/image` e uma lista explícita de arquivos estáticos de primeiro nível (`svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest`).
+  2. Todas as páginas protegidas ficam no grupo de rotas `src/app/(app)/`, cujo `layout.tsx` chama `await exigirSessao()` e renderiza a barra de navegação. `/entrar` fica fora do grupo.
+  3. `exigirSessao()` é chamada fora de qualquer `try/catch` (o `redirect()` funciona lançando `NEXT_REDIRECT`).
+- **Consequências:** páginas protegidas ficam dinâmicas (coerente com ADR-010) e continuam protegidas mesmo se o matcher falhar. Rotas das T007–T009 passam a viver em `src/app/(app)/` (URLs inalteradas).

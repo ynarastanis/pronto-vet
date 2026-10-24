@@ -21,6 +21,7 @@
 - Nenhum dado de paciente persistido; peso só existe no estado do cliente.
 - Variáveis de ambiente: `FONTE_DADOS` (`memoria` no dev até T010), `DATABASE_URL` (pooled), `DIRECT_URL` (direta), `APP_PASSWORD`, `APP_SECRET`.
 - Páginas, actions e componentes acessam dados **apenas** via `servicos()`; nunca importam Prisma nem `src/lib/db.ts`.
+- Páginas protegidas vivem em `src/app/(app)/` (layout com `exigirSessao()`, ADR-012). `exigirSessao()` nunca dentro de `try/catch`.
 
 ## Foco de revisão
 
@@ -56,8 +57,8 @@ T001 ─┬─ T002 ─┬──────────────────
 | `src/lib/auth/token.ts` (+ `.test.ts`) | Token HMAC e comparação de senha | T004 |
 | `src/servicos/tipos.ts`, `erros.ts`, `fonte.ts` (+ `.test.ts`), `index.ts`, `src/servicos/memoria/*` (+ `.test.ts`) | Contratos e mock em memória | T005 |
 | `src/lib/auth/sessao.ts`, `src/proxy.ts`, `src/actions/auth.ts`, `src/app/entrar/page.tsx`, `src/components/barra-navegacao.tsx` | Login e navegação | T006 |
-| `src/actions/profissionais.ts`, `src/app/profissionais/page.tsx`, `src/components/profissionais/*` | CRUD de profissionais | T007 |
-| `src/actions/procedimentos.ts`, `src/app/procedimentos/**`, `src/components/procedimentos/*`, `src/components/confirmar-exclusao.tsx` | CRUD de procedimentos + descrição anestésica | T008 |
+| `src/actions/profissionais.ts`, `src/app/(app)/profissionais/page.tsx`, `src/components/profissionais/*` | CRUD de profissionais | T007 |
+| `src/actions/procedimentos.ts`, `src/app/(app)/procedimentos/**`, `src/components/procedimentos/*`, `src/components/confirmar-exclusao.tsx` | CRUD de procedimentos + descrição anestésica | T008 |
 | `src/lib/preferencias.ts` (+ `.test.ts`), `src/app/page.tsx`, `src/components/gerar/*`, `src/components/botao-copiar.tsx` | Tela Gerar | T009 |
 | `prisma/schema.prisma`, `prisma.config.ts`, `prisma/seed.ts`, `src/lib/db.ts`, `src/servicos/prisma/*` (+ `erros.test.ts`) | Banco e implementação Prisma | T010 |
 | `README.md`, ajustes em `package.json` | Deploy | T011 |
@@ -422,7 +423,7 @@ export async function sair(): Promise<void>; // encerrarSessao(); redirect("/ent
 ### Task T007: Profissionais
 
 **Files:**
-- Create: `src/actions/profissionais.ts`, `src/app/profissionais/page.tsx`, `src/components/profissionais/formulario-profissional.tsx`, `src/components/profissionais/item-profissional.tsx`
+- Create: `src/actions/profissionais.ts`, `src/app/(app)/profissionais/page.tsx`, `src/components/profissionais/formulario-profissional.tsx`, `src/components/profissionais/item-profissional.tsx`
 - Create: `src/components/confirmar-exclusao.tsx` (se T008 ainda não criou; quem chegar primeiro cria, o outro reutiliza)
 
 **Interfaces:**
@@ -452,7 +453,7 @@ export function ConfirmarExclusao(props: { titulo: string; descricao: string; ac
 ### Task T008: Procedimentos e descrição anestésica
 
 **Files:**
-- Create: `src/actions/procedimentos.ts`, `src/app/procedimentos/page.tsx`, `src/app/procedimentos/novo/page.tsx`, `src/app/procedimentos/[id]/page.tsx`, `src/components/procedimentos/formulario-procedimento.tsx`, `src/components/procedimentos/formulario-descricao-anestesica.tsx`
+- Create: `src/actions/procedimentos.ts`, `src/app/(app)/procedimentos/page.tsx`, `src/app/(app)/procedimentos/novo/page.tsx`, `src/app/(app)/procedimentos/[id]/page.tsx`, `src/components/procedimentos/formulario-procedimento.tsx`, `src/components/procedimentos/formulario-descricao-anestesica.tsx`
 - Create/reutilizar: `src/components/confirmar-exclusao.tsx` (ver T007)
 
 **Interfaces:**
@@ -484,7 +485,7 @@ export async function salvarDescricaoAnestesica(procedimentoId: string, estado: 
 
 **Files:**
 - Create: `src/lib/preferencias.ts`, `src/components/gerar/formulario-gerar.tsx`, `src/components/gerar/cartao-texto.tsx`, `src/components/botao-copiar.tsx`
-- Modify: `src/app/page.tsx`
+- Modify: `src/app/(app)/page.tsx`
 - Test: `src/lib/preferencias.test.ts`
 
 **Interfaces:**
