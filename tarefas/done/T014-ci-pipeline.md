@@ -1,6 +1,6 @@
 # T014 — CI no GitHub Actions e documentação do pipeline
 
-- **Status:** implementando
+- **Status:** concluída
 - **Prioridade:** P1
 - **Depende de:** nenhuma (antes da T010)
 - **Branch:** `t014-ci-pipeline`
