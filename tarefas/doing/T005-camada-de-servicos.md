@@ -1,6 +1,6 @@
 # T005 — Camada de serviços e mock em memória
 
-- **Status:** implementando
+- **Status:** em revisão
 - **Prioridade:** P1
 - **Depende de:** T002, T003
 - **Referência na spec:** §13
