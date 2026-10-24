@@ -31,7 +31,7 @@ Página /entrar, actions entrar/sair, exigirSessao, proxy.ts protegendo as rotas
 
 - **Resumo:** Item herdado: `assinarToken`/`verificarToken` tratam `APP_SECRET` só com espaços como não configurado (TDD). Login: `sessao.ts` (criarSessao/encerrarSessao/exigirSessao), `proxy.ts`, actions `entrar`/`sair`, página `/entrar` com `FormularioEntrar` (useActionState) e `BarraNavegacao` (client, oculta em `/entrar`, link ativo destacado, botão Sair) no layout. Desvio de implementação: o matcher do proxy usa `[.]` em vez de `\.`, porque o path-to-regexp do Next descartava a barra invertida e o proxy só rodava em `/`.
 - **Arquivos:** src/lib/auth/token.ts, token.test.ts, sessao.ts; src/proxy.ts; src/actions/auth.ts; src/app/entrar/page.tsx; src/app/layout.tsx; src/components/entrar/formulario-entrar.tsx; src/components/barra-navegacao.tsx
-- **Commits:** 88c9930 (APP_SECRET), bb69ae7 (login e navegação)
+- **Commits:** 8b719fb (APP_SECRET), bb69ae7 (login e navegação)
 - **Verificação manual** (`next dev` + curl, `.env.local` ignorado pelo git, removido ao final; Server Action submetida via multipart com os campos `$ACTION_*` do HTML):
   - Verificado: `/` sem cookie -> 307 `/entrar`; `/procedimentos` sem cookie -> 307 `/entrar`; `/favicon.ico` não é redirecionado.
   - Verificado: senha errada e senha vazia -> "Senha incorreta." após ~1,07 s; `/entrar` sem barra de navegação.
