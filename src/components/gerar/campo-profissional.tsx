@@ -149,7 +149,7 @@ export function CampoProfissional({
         </ul>
       </div>
       {pills.length > 0 && (
-        <ul className="flex flex-wrap gap-1.5" aria-label={`Últimos ${rotulo.toLowerCase()}`}>
+        <ul className="flex flex-wrap gap-x-1.5 gap-y-2" aria-label={`Últimos ${rotulo.toLowerCase()}`}>
           {pills.map((p) => {
             const marcado = p.id === valor;
             return (
@@ -157,15 +157,16 @@ export function CampoProfissional({
                 <button
                   type="button"
                   aria-pressed={marcado}
+                  title={p.nome}
                   onClick={() => aoEscolher(p.id)}
                   className={cn(
-                    "inline-flex h-9 max-w-full items-center rounded-full border px-3 text-[13px] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+                    "relative inline-flex h-6 max-w-full items-center rounded-full border px-2 text-xs font-normal transition-colors before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
                     marcado
                       ? "border-primary bg-accent font-medium text-accent-foreground"
                       : "border-input text-muted-foreground hover:bg-accent hover:text-foreground",
                   )}
                 >
-                  <span className="truncate">{p.nome}</span>
+                  <span className="max-w-[14ch] truncate">{p.nome}</span>
                 </button>
               </li>
             );
