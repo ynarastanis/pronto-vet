@@ -22,6 +22,11 @@ Modelos da spec no Prisma 7 com adapter Neon, migration inicial, implementação
 
 ## Notas do Líder
 
+Herdado da revisão da T005 (paridade memória ↔ Prisma; não há teste automático contra o banco, então conferir manualmente):
+- **Ordenação:** a collation do Neon costuma ser / (conferir com ), que ordena por bytes. Extrair um  compartilhado em  (usado pela memória também) e ordenar em JS após a consulta.
+- **Busca:** aplicar  no termo;  com ctype  não ignora maiúsculas fora do ASCII ("ção" × "ÇÃO") — se for o caso, filtrar em JS com a mesma regra da memória; confirmar que  e  são tratados literalmente.
+- **Erros:** P2002 só vira  se  for o ; P2003 (procedimento excluído durante o upsert) → .
+
 PRÉ-REQUISITOS: checkpoint de validação aprovado; o Líder pede ao usuário as URLs do Neon (pooled e direta) de um branch de dev antes de despachar. Usar Prisma 7.10.x, não a 8.0 rc.
 
 ---
