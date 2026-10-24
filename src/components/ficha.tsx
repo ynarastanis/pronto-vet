@@ -1,21 +1,28 @@
 /**
  * Ficha: superfície do prontuário com a faixa de campo cirúrgico na borda esquerda.
- * `copiado` dispara a varredura da faixa (ver `.varredura-copiado` em globals.css).
+ * `copiado` dispara a varredura da faixa (ver `.varredura-copiado` em globals.css);
+ * `emEdicao` deixa a faixa listrada (edição livre aberta).
  */
 export function Ficha({
   titulo,
+  icone,
   acao,
   copiado = false,
+  emEdicao = false,
   children,
 }: {
   titulo: string;
+  /** Ícone decorativo de 18px ao lado do título. */
+  icone?: React.ReactNode;
   acao?: React.ReactNode;
   copiado?: boolean;
+  emEdicao?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <section
       data-copiado={copiado ? "true" : "false"}
+      data-edicao={emEdicao ? "true" : "false"}
       className="ficha relative min-w-0 overflow-hidden rounded-2xl border bg-card pl-1.5"
     >
       <span
@@ -23,7 +30,10 @@ export function Ficha({
         className="varredura-copiado absolute inset-y-0 left-0 w-1.5 bg-primary"
       />
       <header className="flex items-center justify-between gap-3 px-4 pt-3 sm:px-5">
-        <h2 className="text-base font-semibold">{titulo}</h2>
+        <h2 className="flex min-w-0 items-center gap-2 text-base font-semibold">
+          {icone}
+          {titulo}
+        </h2>
         {acao}
       </header>
       <div className="px-4 pt-3 pb-5 sm:px-5">{children}</div>

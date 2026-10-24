@@ -326,3 +326,61 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Cadeado da edição livre: haste sobe 3px e gira -25° no pino esquerdo (220ms);
+   o corpo faz um "clique" de escala 1, 0.92, 1 (160ms). */
+@keyframes pv-clique-abrir {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+}
+@keyframes pv-clique-fechar {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+}
+.cadeado .cadeado-haste {
+  transform-box: view-box;
+  transform-origin: 7px 11px;
+  transition: transform 220ms var(--curva);
+}
+.cadeado[data-aberto="true"] .cadeado-haste {
+  transform: translateY(-3px) rotate(-25deg);
+}
+.cadeado .cadeado-corpo {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.cadeado[data-mudou="true"][data-aberto="true"] .cadeado-corpo {
+  animation: pv-clique-abrir 160ms var(--curva);
+}
+.cadeado[data-mudou="true"][data-aberto="false"] .cadeado-corpo {
+  animation: pv-clique-fechar 160ms var(--curva);
+}
+
+/* Ficha em edição livre: a faixa fica listrada em diagonal (campo / campo-suave). */
+.ficha[data-edicao="true"] > .varredura-copiado {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--primary) 0 4px,
+    var(--accent) 4px 8px
+  );
+}
+
+/* Troca entre texto gerado e área de edição: crossfade de 160ms. */
+.trocar-modo {
+  animation: pv-fade 160ms var(--curva) both;
+}
+
+/* Traço dos ícones lucide: 1.75. */
+svg.lucide {
+  stroke-width: 1.75;
+}

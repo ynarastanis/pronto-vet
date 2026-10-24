@@ -1,5 +1,6 @@
 "use client";
 
+import { Scissors, Syringe, UserRound, Weight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CartaoTexto } from "@/components/gerar/cartao-texto";
 import { ComboboxProcedimento } from "@/components/gerar/combobox-procedimento";
@@ -29,12 +30,14 @@ const NENHUM = "nenhum";
 function SelectProfissional({
   id,
   rotulo,
+  icone,
   profissionais,
   valor,
   aoMudar,
 }: {
   id: string;
   rotulo: string;
+  icone: React.ReactNode;
   profissionais: Profissional[];
   valor: string | null;
   aoMudar: (id: string | null) => void;
@@ -45,7 +48,10 @@ function SelectProfissional({
   ];
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <Label htmlFor={id}>{rotulo}</Label>
+      <Label htmlFor={id}>
+        {icone}
+        {rotulo}
+      </Label>
       <Select
         items={itens}
         value={valor ?? NENHUM}
@@ -119,7 +125,10 @@ export function FormularioGerar({
         className="grid gap-4 rounded-xl border bg-card p-4 md:grid-cols-2 lg:sticky lg:top-20 lg:grid-cols-1"
       >
         <div className="flex min-w-0 flex-col gap-2 md:col-span-2 lg:col-span-1">
-          <Label htmlFor="procedimento">Procedimento</Label>
+          <Label htmlFor="procedimento">
+            <Scissors aria-hidden className="size-4 text-muted-foreground" />
+            Procedimento
+          </Label>
           <ComboboxProcedimento
             id="procedimento"
             opcoes={procedimentos}
@@ -130,6 +139,7 @@ export function FormularioGerar({
         <SelectProfissional
           id="cirurgiao"
           rotulo="Cirurgião"
+          icone={<UserRound aria-hidden className="size-4 text-muted-foreground" />}
           profissionais={cirurgioes}
           valor={cirurgiaoId}
           aoMudar={(id) => {
@@ -140,6 +150,7 @@ export function FormularioGerar({
         <SelectProfissional
           id="anestesista"
           rotulo="Anestesista"
+          icone={<Syringe aria-hidden className="size-4 text-muted-foreground" />}
           profissionais={anestesistas}
           valor={anestesistaId}
           aoMudar={(id) => {
@@ -148,7 +159,10 @@ export function FormularioGerar({
           }}
         />
         <div className="flex min-w-0 flex-col gap-2">
-          <Label htmlFor="peso">Peso (kg)</Label>
+          <Label htmlFor="peso">
+            <Weight aria-hidden className="size-4 text-muted-foreground" />
+            Peso (kg)
+          </Label>
           <Input
             id="peso"
             value={peso}
@@ -163,11 +177,13 @@ export function FormularioGerar({
       <div className="grid min-w-0 gap-4 md:grid-cols-2">
         <CartaoTexto
           titulo="Descrição Cirúrgica"
+          icone={<Scissors aria-hidden className="size-[18px]" />}
           texto={textos?.cirurgico ?? null}
           procedimentoId={procedimentoId}
         />
         <CartaoTexto
           titulo="Descrição Anestésica"
+          icone={<Syringe aria-hidden className="size-[18px]" />}
           texto={textos?.anestesico ?? null}
           procedimentoId={procedimentoId}
         />

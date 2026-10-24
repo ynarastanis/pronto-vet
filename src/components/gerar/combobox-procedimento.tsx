@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronsUpDown, Scissors } from "lucide-react";
 import { useState } from "react";
 import {
   Command,
@@ -41,10 +41,11 @@ export function ComboboxProcedimento({
           !escolhido && "text-muted-foreground",
         )}
       >
-        <span className="line-clamp-1">
+        <Scissors aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+        <span className="line-clamp-1 flex-1">
           {escolhido ? escolhido.nome : "Escolher procedimento"}
         </span>
-        <ChevronDownIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+        <ChevronsUpDown aria-hidden className="size-4 shrink-0 text-muted-foreground" />
       </PopoverTrigger>
       <PopoverContent
         align="start"
