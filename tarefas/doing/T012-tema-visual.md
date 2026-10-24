@@ -1,6 +1,6 @@
 # T012 — Tema visual e componentes base
 
-- **Status:** implementando
+- **Status:** em revisão
 - **Prioridade:** P1
 - **Depende de:** T006 (executar antes de T007, T008 e T009)
 - **Referência:** `docs/design/sistema-visual.md`, ADR-013
@@ -25,6 +25,11 @@ Aplicar o sistema visual verde (tokens claro/escuro, Onest + Literata, raios, ut
 
 - Carregar o skill `frontend-design:frontend-design`; as escolhas de `docs/design/sistema-visual.md` prevalecem sobre ideias novas.
 - O Líder fará conferência visual no navegador do app após a implementação.
+
+**Conferência visual do Líder (navegador do app, rodada 1):**
+- ok: `/entrar` claro e escuro (ficha com faixa verde, botão verde-campo; no escuro botão menta); `/` com barra, pílula no link ativo; Onest carregada; sem rolagem horizontal em 375px; console sem erros.
+- problema: em 375px o último link aparece **cortado** ("Profissiona") ao lado de "Sair" — parece quebrado, mesmo rolando. Precisa caber ou indicar rolagem de forma clara (ex.: Sair só com ícone + rótulo acessível no celular, espaçamentos menores).
+- não verificado: deslize da pílula entre páginas (as outras rotas ainda não existem).
 
 ---
 
