@@ -118,7 +118,7 @@ Sem animação automática na carga das páginas além do fade de 160ms. Sem hov
 Cada ficha da tela Gerar tem um **cadeado** no cabeçalho, ao lado de Copiar.
 
 - **Fechado (padrão):** o texto é gerado automaticamente pelas escolhas; não editável.
-- **Aberto:** o corpo da ficha vira uma área de texto (Literata, mesma aparência do documento, com fundo `--campo-suave` sutil e anel de foco) iniciada com o texto atual. O usuário edita livremente; **Copiar copia o texto editado**. Mudanças nas escolhas (procedimento, profissionais, peso) **não sobrescrevem** a edição — abaixo do texto aparece a nota "Edição livre. Feche o cadeado para voltar ao texto gerado."
+- **Aberto:** o corpo da ficha vira uma área de texto (Literata, mesma aparência do documento, com fundo `--campo-suave` sutil e anel de foco) iniciada com o texto atual. O usuário edita livremente; **Copiar copia o texto editado**. Mudanças nas escolhas (procedimento, profissionais, peso) **não sobrescrevem** a edição — **logo abaixo do título da ficha** (no cabeçalho) aparece a nota "Edição livre. Feche o cadeado para voltar ao texto gerado." (13px, ícone `PencilLine`, cor `--edicao` se passar AA sobre `--edicao-suave`, senão `--tinta` com ícone azul).
 - **Fechar de novo:** descarta a edição e volta ao texto gerado, com o crossfade de troca de texto. Se o texto foi alterado, pede confirmação ("Descartar edição?" / "O texto volta a ser gerado pelas escolhas." / Cancelar · Descartar).
 - Trocar de **procedimento** com a ficha aberta: mantém aberta e mantém a edição (o usuário decide fechar).
 - A edição **nunca é salva** (vive só no estado da tela; nada de paciente persiste — spec §2).
