@@ -24,7 +24,7 @@ export function FormularioEntrar() {
           aria-describedby={erro ? "erro-senha" : undefined}
         />
         {erro && (
-          <p id="erro-senha" role="alert" className="text-sm text-destructive">
+          <p id="erro-senha" role="alert" className="text-[13px] text-destructive">
             {erro}
           </p>
         )}
