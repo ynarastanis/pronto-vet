@@ -1,6 +1,6 @@
 # T002 — Geração dos textos cirúrgico e anestésico
 
-- **Status:** a fazer
+- **Status:** implementando
 - **Prioridade:** P1
 - **Depende de:** T001
 - **Referência na spec:** §6

@@ -1,25 +1,24 @@
-# T004 — Token de sessão e verificação de senha
+# T003 — Schemas de validação (Zod)
 
-- **Status:** a fazer
+- **Status:** implementando
 - **Prioridade:** P1
 - **Depende de:** T001
-- **Referência na spec:** §8
-- **Plano:** `docs/superpowers/plans/2026-10-24-pronto-vet.md` → *Task T004* (passos, interfaces e testes exatos)
+- **Referência na spec:** §9
+- **Plano:** `docs/superpowers/plans/2026-10-24-pronto-vet.md` → *Task T003* (passos, interfaces e testes exatos)
 
 ## Objetivo
 
-assinarToken, verificarToken e senhaConfere com Web Crypto, falhando fechado sem segredo/senha configurados.
+Schemas Zod com mensagens em pt-BR, validarFormulario e os tipos ResultadoValidacao/ResultadoAcao.
 
 ## Critérios de aceite
 
-- [ ] Só crypto.subtle (sem node:crypto)
-- [ ] verificarToken nunca lança
-- [ ] Sem APP_PASSWORD/APP_SECRET: nenhum acesso é concedido
+- [ ] Mensagens exatamente como na tabela do plano
+- [ ] Opcionais vazios ou só com espaços viram null
 - [ ] `npm run lint`, `npm run typecheck` e `npm test` passando
 
 ## Notas do Líder
 
-Pode rodar em paralelo com T002 e T003.
+Pode rodar em paralelo com T002 e T004.
 
 ---
 
