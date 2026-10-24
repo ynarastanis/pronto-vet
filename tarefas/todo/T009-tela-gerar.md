@@ -21,6 +21,8 @@ Tela principal: escolher procedimento, profissionais e peso; prévias dos dois t
 
 ## Notas do Líder
 
+- Contraste: `--copiado` sobre branco é 3,07:1 — use-o só na faixa/varredura e no ícone; o rótulo "Copiado" fica em `--tinta` ou `--primary`.
+
 - UI: carregar o skill `frontend-design:frontend-design` e seguir `docs/design/sistema-visual.md`; usar `CabecalhoPagina`, `EstadoVazio` e `Ficha` da T012. Animações conforme a seção "Movimento".
 
 - ADR-012: páginas em `src/app/(app)/`; `await exigirSessao()` é a **primeira linha de cada `page.tsx` e de cada action**, antes de ler dados, e fica **fora** de qualquer `try/catch` (o `redirect()` lança `NEXT_REDIRECT`). O layout do grupo sozinho **não** protege navegações no cliente.

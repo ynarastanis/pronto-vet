@@ -509,7 +509,7 @@ export async function salvarDescricaoAnestesica(procedimentoId: string, estado: 
 - Toasts: "Procedimento salvo." / "Descrição anestésica salva.".
 
 - [ ] **Passo 1: Implementar** actions, páginas e formulários.
-- [ ] **Passo 2: Verificar manualmente** — criar procedimento (aparece com selo), nome duplicado mostra "Já existe um procedimento com este nome.", salvar descrição anestésica (selo some), campos opcionais vazios voltam vazios ao recarregar a página, excluir remove ambos, `/procedimentos/xyz` mostra "Página não encontrada.".
+- [ ] **Passo 2: Verificar manualmente** — criar procedimento (aparece com selo), nome duplicado mostra "Já existe um procedimento com este nome.", salvar descrição anestésica (selo some), campos opcionais vazios voltam vazios ao recarregar a página, excluir remove ambos, `/procedimentos/xyz` mostra "Página não encontrada".
 - [ ] **Passo 3: Rodar** `npm test && npm run lint && npm run typecheck && npm run build` → OK.
 - [ ] **Passo 4: Commit** — `T008: adiciona cadastro de procedimentos e descrição anestésica`.
 

@@ -1,6 +1,6 @@
 # T012 — Tema visual e componentes base
 
-- **Status:** em revisão
+- **Status:** implementando
 - **Prioridade:** P1
 - **Depende de:** T006 (executar antes de T007, T008 e T009)
 - **Referência:** `docs/design/sistema-visual.md`, ADR-013
@@ -22,6 +22,13 @@ Aplicar o sistema visual verde (tokens claro/escuro, Onest + Literata, raios, ut
 - [x] `npm run lint`, `npm run typecheck` e `npm test` passando
 
 ## Notas do Líder
+
+**Decisões da rodada 1 (para a rodada 2):**
+1. Bloqueante: aplicar a correção da barra proposta pelo Revisor (marca oculta abaixo de `sm`, Sair só com ícone `LogOut` + `aria-label` abaixo de `sm`, links `px-2 text-[13px] sm:px-2.5 sm:text-sm`, `gap-2 sm:gap-3`).
+2. Remover `overflow-x: hidden` do `body` (ou trocar por `clip` só se houver motivo documentado) — estouro deve aparecer, não ser escondido.
+3. Pílula: recalcular após `document.fonts.ready` e observar o tamanho de cada link.
+4. Completar os utilitários de movimento que faltam na seção "Movimento": saída de 120ms do crossfade (`.trocar-texto`), check do Copiar (escala 0.9→1), erro de formulário (fade + altura), item de lista entrando/saindo (fade + altura). Todos sob `prefers-reduced-motion`.
+5. Offset do anel de foco dentro de `Ficha` usa a cor da superfície (`--card`).
 
 - Carregar o skill `frontend-design:frontend-design`; as escolhas de `docs/design/sistema-visual.md` prevalecem sobre ideias novas.
 - O Líder fará conferência visual no navegador do app após a implementação.
@@ -58,6 +65,16 @@ Não verificado visualmente (sem navegador nesta etapa): aparência em 1280/375p
 <!-- preenchido pelo Revisor (Opus, sessão limpa) -->
 
 - **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [ ] `arquivo:linha` — …
+- **Veredito:** alterações solicitadas
+- **Verificado pelo Revisor:** `npm run lint` ok; `npm run typecheck` ok; `npm test` 55/55; `npm run build` ok (ƒ /, ○ /entrar, ○ /_not-found); `curl /entrar` 200, `curl /` sem cookie 307 → `/entrar`. Tokens: todos os hex claro/escuro conferem com a tabela (inclusive `--muted` `#EAF1ED`/`#183029`, `--ring` = campo, `--input` = fio). Contraste (WCAG): `--tinta-suave` sobre `--fundo` 5,02:1 (claro) / 7,17:1 (escuro); sobre `--folha` 5,42:1 / 6,49:1; sobre `--muted` 4,73:1 / 5,64:1; texto do botão primário 7,90:1 (branco sobre `#0E5C4D`) / 9,65:1 (`#0C1A16` sobre `#5FD3A4`); link ativo (`--primary` sobre `--accent`) 6,79:1 / 6,73:1 — tudo AA. Fontes: Onest 400/500/600 e Literata 400 via `next/font`, Geist sem ocorrências. `prefers-reduced-motion`: regra global com `!important` em `*, ::before, ::after` cobre `tw-animate-css` (mantém `animationend`, então o Radix ainda desmonta), a pílula (vence o `style.transition` inline) e a varredura. Segurança: `Tema` (client) e `(app)/template.tsx` não leem dados nem mexem em sessão; `(app)/layout.tsx` e `(app)/page.tsx` mantêm `await exigirSessao()` na primeira linha, fora de `try/catch` (ADR-012 intacta). APIs de `CabecalhoPagina`, `EstadoVazio` e `Ficha` batem com o plano.
+- **Apontamentos bloqueantes:**
+  - [ ] `src/components/barra-navegacao.tsx:59-100` — em 360/375px os links não cabem: medido no navegador do app, conteúdo da lista 281px contra 243px visíveis em 360px (≈258px em 375px), daí "Profissiona" cortado; e o critério "sem rolagem horizontal em 360px" continua desmarcado. — Abaixo de `sm`: (1) esconder a marca "■" (linha 61-67: `hidden sm:flex`; "Gerar" já leva a `/`); (2) "Sair" só com ícone `LogOut` do `lucide-react` (já instalado) em botão `size-10`, com `aria-label="Sair"`, e rótulo visível a partir de `sm` (`<span className="hidden sm:inline">Sair</span>`); (3) links com `px-2 text-[13px] sm:px-2.5 sm:text-sm` (13px está na escala); (4) `gap-2 sm:gap-3` no `<nav>`. Simulei exatamente isso no navegador em 360px: conteúdo 253px em 280px disponíveis (margem de 27px), sem corte. Manter a marca com o resto da proposta deixa só 3px de folga — não recomendo. Depois, o Líder confere em 360 e 375px, claro e escuro, e marca o critério.
+- **Sugestões (não bloqueantes):**
+  - [ ] `src/components/barra-navegacao.tsx:50` — o `ResizeObserver` observa só a lista (`flex-1`), cuja largura não muda quando a Onest substitui o fallback (`display: swap`) ou quando o peso 500 do link ativo muda a largura do link; a pílula pode ficar com a largura antiga até a próxima navegação. — Observar também cada link (`raiz.querySelectorAll("a").forEach(a => observador.observe(a))`) ou chamar `document.fonts.ready.then(posicionar)`.
+  - [ ] `src/app/globals.css:140` — `overflow-x: hidden` no `body` esconde estouros em vez de evitá-los (foi o que mascarou o corte na barra para a checagem "sem rolagem horizontal"). — Remover, ou trocar por `overflow-x: clip`, e conferir 360px sem ele.
+  - [ ] `src/app/globals.css:201` — a seção "Movimento" pede crossfade (saída 120ms + entrada 200ms/4px); `.trocar-texto` só faz a entrada. Também não há utilitários para o check do Copiar (escala 0.9→1), para erros de formulário (fade + altura) e para entrada/saída de itens de lista. — Aceitável deixar para T007–T009 (podem usar `animate-in fade-in` do `tw-animate-css`), mas registrar no plano para não virar uma ideia diferente em cada tela.
+  - [ ] `src/components/ui/badge.tsx:7` — o selo ainda usa o foco antigo do shadcn (`ring-[3px] ring-ring/50`), diferente do anel 2px + offset 2px dos demais. Só importa se T008 usar um Badge clicável; nesse caso, alinhar ao `button.tsx`.
+  - [ ] `src/components/ui/{button,input,select,textarea}.tsx` — `ring-offset-background` dentro de uma `Ficha`/superfície `bg-card` faz o offset aparecer em outra cor (`#F3F7F5` sobre branco; `#0C1A16` sobre `#12241F`). Pequeno; dá para resolver com `ring-offset-card` no contexto da ficha ou deixar como está.
+  - [ ] `src/app/not-found.tsx:8` — o título agora é "Página não encontrada" (sem ponto), mas o Passo 2 da T008 espera ver "Página não encontrada.". — Ajustar o texto do plano da T008 para o título atual (preferível) ou repor o ponto.
+  - [ ] `src/app/global-error.tsx:8` — sem `Tema` e sem as variáveis das fontes, a página fica sempre clara e em `system-ui`. Aceitável para erro global; se quiser, aplicar `onest.variable` no `<html>`.
+  - [ ] Para T009: `--copiado` (`#2FA676`) sobre branco dá 3,07:1 — serve como preenchimento da faixa (não texto), mas não deve ser usado como cor de texto do rótulo "Copiado".
