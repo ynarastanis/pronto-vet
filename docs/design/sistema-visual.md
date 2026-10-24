@@ -116,6 +116,7 @@ Sem animação automática na carga das páginas além do fade de 160ms. Sem hov
 | Campo Cirurgião | `UserRound` |
 | Campo Anestesista | `Syringe` |
 | Campo Peso | `Weight` |
+| Mostrar/ocultar senha | `Eye` / `EyeOff` |
 | Busca | `Search` |
 | Novo / Adicionar | `Plus` |
 | Editar | `Pencil` |
