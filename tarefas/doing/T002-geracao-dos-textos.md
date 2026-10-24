@@ -26,9 +26,7 @@ Pode rodar em paralelo com T003 e T004.
 
 <!-- preenchido pelo Implementador (Sonnet) -->
 
-- **Resumo:** normalizarTexto (
- e  para 
-, trim, null vira ""), gerarTextoCirurgico e gerarTextoAnestesico como funções puras; peso sem sufixo kg duplicado, "--" para ausentes, opcionais vazios omitidos. 10 testes (4 cirúrgico, 6 anestésico).
+- **Resumo:** normalizarTexto (CRLF e CR viram LF, trim, null vira ""), gerarTextoCirurgico e gerarTextoAnestesico como funções puras; peso sem sufixo kg duplicado, "--" para ausentes, opcionais vazios omitidos. 10 testes (4 cirúrgico, 6 anestésico).
 - **Arquivos:** src/lib/texto/{tipos,normalizar,cirurgico,anestesico}.ts, cirurgico.test.ts, anestesico.test.ts
 - **Commits:** 1d579ab (T002: adiciona geração dos textos cirúrgico e anestésico), mais o commit de preenchimento desta seção
 - **Saída de lint / typecheck / testes:**
