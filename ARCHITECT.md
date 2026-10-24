@@ -96,3 +96,15 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
 - **Contexto:** o usuário pediu UI moderna, com animações e transições suaves e tema verde.
 - **Decisão:** sistema visual em `docs/design/sistema-visual.md` (verde cirúrgico, Onest + Literata via `next/font`, fichas com faixa de campo cirúrgico, modo escuro automático com `next-themes`). Animações apenas com CSS e `tw-animate-css` (já instalados) — sem biblioteca de animação adicional. Toda animação respeita `prefers-reduced-motion`.
 - **Consequências:** nenhuma dependência nova; T012 cria tokens, fontes, utilitários de movimento e componentes base antes das telas T007–T009.
+
+## ADR-014 — Neon via CLI `neon` (perfil da Ynara) e variáveis no padrão do Neon
+
+- **Status:** aceita (2026-10-24). Substitui, na ADR-002, o nome `DIRECT_URL`.
+- **Contexto:** o projeto Neon (`green-cherry-00787842`, org `org-muddy-sea-26273725`) é da conta da Ynara; o usuário do computador usa outra conta por padrão. A integração Neon ↔ Vercel e o `neon init` usam os nomes `DATABASE_URL` (pooled) e `DATABASE_URL_UNPOOLED` (direta).
+- **Decisão:**
+  1. Conexão direta passa a se chamar `DATABASE_URL_UNPOOLED` (spec, `.env.example`, plano e `prisma.config.ts` da T010).
+  2. Branches do Neon: `production` (padrão, usado pela Vercel em produção), `development` (usado no `.env.local`), e um branch por Preview criado pela integração da Vercel.
+  3. Todo comando da CLI `neon` neste projeto usa `--profile ynara`; o perfil padrão da máquina fica para a conta do usuário.
+  4. `neon.ts` (política de branches) fica versionado; `@neon/config` é `devDependency` (só tipa o `neon.ts`). `@neon/env`, adicionado pelo `neon init`, foi removido por não ser usado. A pasta `.neon` (vínculo local) fica no `.gitignore`.
+  5. `neon init` rodou com `--no-agent-setup`: o plugin/MCP do Neon não foi instalado no Claude Code do usuário, para não ligar a conta da Ynara à configuração global dele.
+- **Consequências:** nenhuma variável renomeada à mão na Vercel; a T010 lê `DATABASE_URL` no runtime e `DATABASE_URL_UNPOOLED` nas migrations.

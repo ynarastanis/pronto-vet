@@ -205,10 +205,10 @@ Barra superior: **Gerar · Procedimentos · Profissionais · Sair**. Layout resp
 
 ## 11. Deploy e ambiente
 
-- Neon: `DATABASE_URL` (pooled, runtime) e `DIRECT_URL` (direta, migrations).
+- Neon: `DATABASE_URL` (pooled, runtime) e `DATABASE_URL_UNPOOLED` (direta, migrations).
 - Prisma Client gerado no install/build; `prisma migrate deploy` no build da Vercel.
 - `prisma/seed.ts` opcional, reaproveitando os mesmos dados de demonstração do mock em memória.
-- `.env.example` documenta `FONTE_DADOS`, `DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD`, `APP_SECRET`.
+- `.env.example` documenta `FONTE_DADOS`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `APP_PASSWORD`, `APP_SECRET`.
 - Em produção (Vercel) `FONTE_DADOS` **não** é definida (ou é diferente de `memoria`), então o app usa Prisma.
 - Versões: as estáveis mais recentes de Next.js, Prisma, Tailwind e shadcn/ui no momento da implementação; o plano de implementação fixa as versões e segue a documentação oficial de cada uma (ex.: nome do arquivo de proxy/middleware e configuração do Prisma variam entre versões principais).
 

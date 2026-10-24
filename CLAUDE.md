@@ -45,7 +45,7 @@ Next.js (App Router, Server Components + Server Actions), Prisma, Postgres (Neon
 
 ## Segredos e ambiente
 
-`FONTE_DADOS`, `DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD`, `APP_SECRET` — apenas via variáveis de ambiente. Desenvolvimento local usa `FONTE_DADOS=memoria` até a implementação Prisma existir; produção nunca define `memoria`.
+`FONTE_DADOS`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `APP_PASSWORD`, `APP_SECRET` — apenas via variáveis de ambiente. Desenvolvimento local usa `FONTE_DADOS=memoria` até a implementação Prisma existir; produção nunca define `memoria`.
 
 ## Notas do Next.js
 

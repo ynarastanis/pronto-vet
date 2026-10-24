@@ -20,7 +20,7 @@
 - Scripts obrigatórios em `package.json`: `lint` (`eslint .`), `typecheck` (`tsc --noEmit`), `test` (`vitest run`).
 - Commits: `T<NNN>: <descrição pt-BR no imperativo>`.
 - Nenhum dado de paciente persistido; peso só existe no estado do cliente.
-- Variáveis de ambiente: `FONTE_DADOS` (`memoria` no dev até T010), `DATABASE_URL` (pooled), `DIRECT_URL` (direta), `APP_PASSWORD`, `APP_SECRET`.
+- Variáveis de ambiente: `FONTE_DADOS` (`memoria` no dev até T010), `DATABASE_URL` (pooled), `DATABASE_URL_UNPOOLED` (direta), `APP_PASSWORD`, `APP_SECRET`.
 - Páginas, actions e componentes acessam dados **apenas** via `servicos()`; nunca importam Prisma nem `src/lib/db.ts`.
 - Páginas protegidas vivem em `src/app/(app)/` e **toda `page.tsx` protegida e toda Server Action chamam `await exigirSessao()` na primeira linha** (ADR-012; o layout do grupo sozinho não protege). `exigirSessao()` nunca dentro de `try/catch`.
 
@@ -90,7 +90,7 @@ T001 ─┬─ T002 ─┬──────────────────
 # Neon — conexão com pooler (runtime)
 DATABASE_URL=
 # Neon — conexão direta (migrations)
-DIRECT_URL=
+DATABASE_URL_UNPOOLED=
 # Senha compartilhada da equipe
 APP_PASSWORD=
 # Chave para assinar o cookie de sessão (ex.: openssl rand -base64 32)
@@ -563,7 +563,7 @@ it("lerPreferencia retorna null sem localStorage")  // ambiente node, sem global
 
 ### Task T010: Banco de dados e implementação Prisma dos serviços
 
-**Pré-requisitos (Líder):** (1) checkpoint de validação aprovado pelo usuário; (2) pedir ao usuário as URLs do Neon (`DATABASE_URL` pooled e `DIRECT_URL`) de um branch de desenvolvimento e gravá-las em `.env` local (não commitado).
+**Pré-requisitos (Líder):** (1) checkpoint de validação aprovado pelo usuário; (2) pedir ao usuário as URLs do Neon (`DATABASE_URL` pooled e `DATABASE_URL_UNPOOLED`) de um branch de desenvolvimento e gravá-las em `.env` local (não commitado).
 
 **Files:**
 - Create: `prisma/schema.prisma`, `prisma.config.ts`, `prisma/migrations/*`, `prisma/seed.ts`, `src/lib/db.ts`, `src/servicos/prisma/erros.ts`, `src/servicos/prisma/profissionais.ts`, `src/servicos/prisma/procedimentos.ts`, `src/servicos/prisma/index.ts`
@@ -584,7 +584,7 @@ export function traduzirErroPrisma(erro: unknown): unknown;
 export function servicosPrisma(): Servicos; // implementa exatamente o contrato de T005
 ```
 
-Modelos: exatamente os da spec §5 (`Papel`, `Profissional`, `ProcedimentoCirurgico`, `DescricaoAnestesica`). Generator `prisma-client` com `output = "../src/generated/prisma"`. `prisma.config.ts` com `import "dotenv/config"`, schema `prisma/schema.prisma`, migrations `prisma/migrations`, `seed: "tsx prisma/seed.ts"` e datasource url `DIRECT_URL`. Mapeamento: `ProcedimentoCirurgico` → `Procedimento` (sem `createdAt`/`updatedAt`); busca com `contains` + `mode: "insensitive"`; `listarCompletos` com `where: { descricaoAnestesica: { isNot: null } }`; `excluir` com `deleteMany` (no-op se inexistente); `salvarDescricaoAnestesica` com `upsert` por `procedimentoId`, conferindo antes se o procedimento existe. Toda chamada ao Prisma envolta em `try/catch` → `throw traduzirErroPrisma(e)`.
+Modelos: exatamente os da spec §5 (`Papel`, `Profissional`, `ProcedimentoCirurgico`, `DescricaoAnestesica`). Generator `prisma-client` com `output = "../src/generated/prisma"`. `prisma.config.ts` com `import "dotenv/config"`, schema `prisma/schema.prisma`, migrations `prisma/migrations`, `seed: "tsx prisma/seed.ts"` e datasource url `DATABASE_URL_UNPOOLED`. Mapeamento: `ProcedimentoCirurgico` → `Procedimento` (sem `createdAt`/`updatedAt`); busca com `contains` + `mode: "insensitive"`; `listarCompletos` com `where: { descricaoAnestesica: { isNot: null } }`; `excluir` com `deleteMany` (no-op se inexistente); `salvarDescricaoAnestesica` com `upsert` por `procedimentoId`, conferindo antes se o procedimento existe. Toda chamada ao Prisma envolta em `try/catch` → `throw traduzirErroPrisma(e)`.
 
 - [ ] **Passo 1: Teste (falhando)** — `traduzirErroPrisma({ code: "P2002" })` é `ErroNomeDuplicado`; `({ code: "P2025" })` é `ErroNaoEncontrado`; `new Error("x")` retorna o mesmo objeto.
 - [ ] **Passo 2: Rodar** → FAIL. **Passo 3: Implementar** (checagem pela forma do objeto, sem `instanceof` de classes Prisma). **Passo 4: Rodar** → PASS.
@@ -607,7 +607,7 @@ Modelos: exatamente os da spec §5 (`Papel`, `Profissional`, `ProcedimentoCirurg
 - Consumes: tudo das tasks anteriores.
 
 - [ ] **Passo 1: Script de build** conforme acima; confirmar que `postinstall` roda `prisma generate`.
-- [ ] **Passo 2: `README.md`** em pt-BR: o que é o app; rodar localmente com mock (`FONTE_DADOS=memoria`, `npm run dev`) e com banco (sem `FONTE_DADOS`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`); comandos `lint`/`typecheck`/`test`; deploy (criar projeto no Neon, copiar URLs pooled e direta, importar repositório na Vercel, configurar `DATABASE_URL`, `DIRECT_URL`, `APP_PASSWORD` e `APP_SECRET` em Production e Preview — **sem** `FONTE_DADOS`, gerar `APP_SECRET` com `openssl rand -base64 32`; trocar `APP_PASSWORD` + `APP_SECRET` para revogar acessos); link para spec, `ARCHITECT.md` e `AGENTS.md`.
+- [ ] **Passo 2: `README.md`** em pt-BR: o que é o app; rodar localmente com mock (`FONTE_DADOS=memoria`, `npm run dev`) e com banco (sem `FONTE_DADOS`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`); comandos `lint`/`typecheck`/`test`; deploy (criar projeto no Neon, copiar URLs pooled e direta, importar repositório na Vercel, configurar `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `APP_PASSWORD` e `APP_SECRET` em Production e Preview — **sem** `FONTE_DADOS`, gerar `APP_SECRET` com `openssl rand -base64 32`; trocar `APP_PASSWORD` + `APP_SECRET` para revogar acessos); link para spec, `ARCHITECT.md` e `AGENTS.md`.
 - [ ] **Passo 3: Verificar** — `npm run build` com `.env` de dev aplica migrations (nenhuma pendente) e conclui; `npm start` serve o app e o fluxo login → gerar → copiar funciona.
 - [ ] **Passo 4: Commit** — `T011: prepara build e documentação de deploy`.
 
