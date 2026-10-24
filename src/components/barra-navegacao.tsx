@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardList, LogOut, Scissors, Users } from "lucide-react";
+import { ClipboardList, LogOut, Users } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { sair } from "@/actions/auth";
+import { IconeMascara } from "@/components/icone-mascara";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/", rotulo: "Gerar", Icone: ClipboardList },
-  { href: "/procedimentos", rotulo: "Procedimentos", Icone: Scissors },
+  { href: "/procedimentos", rotulo: "Procedimentos", Icone: IconeMascara },
   { href: "/profissionais", rotulo: "Profissionais", Icone: Users },
 ];
 

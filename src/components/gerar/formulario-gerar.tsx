@@ -1,10 +1,11 @@
 "use client";
 
-import { Scissors, Syringe, UserRound, Weight } from "lucide-react";
+import { Syringe, UserRound, Weight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CampoProfissional } from "@/components/gerar/campo-profissional";
 import { CartaoTexto } from "@/components/gerar/cartao-texto";
 import { ComboboxProcedimento } from "@/components/gerar/combobox-procedimento";
+import { IconeMascara } from "@/components/icone-mascara";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -101,7 +102,7 @@ export function FormularioGerar({
       >
         <div className="flex min-w-0 flex-col gap-2">
           <Label htmlFor="procedimento">
-            <Scissors aria-hidden className="size-4 text-muted-foreground" />
+            <IconeMascara aria-hidden className="size-4 text-muted-foreground" />
             Procedimento
           </Label>
           <ComboboxProcedimento
@@ -164,7 +165,7 @@ export function FormularioGerar({
       <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
         <CartaoTexto
           titulo="Descrição Cirúrgica"
-          icone={<Scissors aria-hidden className="size-[18px]" />}
+          icone={<IconeMascara aria-hidden className="size-[18px]" />}
           texto={textos?.cirurgico ?? null}
           procedimentoId={procedimentoId}
         />
