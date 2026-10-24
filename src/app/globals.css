@@ -248,6 +248,22 @@
   border-radius: 0.25rem;
 }
 
+/* Destaque das escolhas na ficha travada: só visual, sem conteúdo gerado por CSS. */
+.destaque-escolha {
+  background-color: var(--accent);
+  font-weight: 500;
+  border-radius: 0.25rem;
+  padding-block: 0.0625rem;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.destaque-ausente {
+  font-weight: 500;
+  text-decoration: underline dashed;
+  text-decoration-color: var(--muted-foreground);
+  text-underline-offset: 0.25em;
+}
+
 /* Troca de procedimento: texto entra em 200ms com deslocamento de 4px (usar com key). */
 .trocar-texto {
   animation: pv-entrar-4px 200ms var(--curva) both;

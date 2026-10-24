@@ -22,6 +22,10 @@ import {
 } from "@/lib/recentes";
 import { gerarTextoAnestesico } from "@/lib/texto/anestesico";
 import { gerarTextoCirurgico } from "@/lib/texto/cirurgico";
+import {
+  segmentosAnestesico,
+  segmentosCirurgico,
+} from "@/lib/texto/segmentos";
 import type { EntradaGeracao } from "@/lib/texto/tipos";
 import type { ProcedimentoCompleto, Profissional } from "@/servicos/tipos";
 
@@ -89,6 +93,8 @@ export function FormularioGerar({
     return {
       cirurgico: gerarTextoCirurgico(entrada),
       anestesico: gerarTextoAnestesico(entrada),
+      segmentosCirurgico: segmentosCirurgico(entrada),
+      segmentosAnestesico: segmentosAnestesico(entrada),
     };
   }, [procedimento, cirurgiao, anestesista, peso]);
 
@@ -166,12 +172,14 @@ export function FormularioGerar({
           titulo="Descrição Cirúrgica"
           icone={<Slice aria-hidden className="size-[1.125rem]" />}
           texto={textos?.cirurgico ?? null}
+          segmentos={textos?.segmentosCirurgico ?? null}
           procedimentoId={procedimentoId}
         />
         <CartaoTexto
           titulo="Descrição Anestésica"
           icone={<Syringe aria-hidden className="size-[1.125rem]" />}
           texto={textos?.anestesico ?? null}
+          segmentos={textos?.segmentosAnestesico ?? null}
           procedimentoId={procedimentoId}
         />
       </div>

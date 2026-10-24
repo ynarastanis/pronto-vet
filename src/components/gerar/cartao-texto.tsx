@@ -15,12 +15,14 @@ import {
   textoExibido,
 } from "@/lib/edicao-livre";
 import { linhasAlteradas } from "@/lib/linhas-alteradas";
+import { dividirEmLinhas, type Segmento } from "@/lib/texto/segmentos";
 
 const SAIDA_MS = 120;
 
 type Exibido = {
   procedimentoId: string | null;
   texto: string | null;
+  segmentos: Segmento[] | null;
   realce: number[];
   versao: number;
 };
@@ -36,11 +38,14 @@ export function CartaoTexto({
   titulo,
   icone,
   texto,
+  segmentos,
   procedimentoId,
 }: {
   titulo: string;
   icone: React.ReactNode;
   texto: string | null;
+  /** Mesmo texto, em trechos; só para o destaque visual. */
+  segmentos: Segmento[] | null;
   procedimentoId: string | null;
 }) {
   const alvoRef = useRef<HTMLDivElement>(null);
@@ -50,6 +55,7 @@ export function CartaoTexto({
   const [exibido, setExibido] = useState<Exibido>({
     procedimentoId,
     texto,
+    segmentos,
     realce: [],
     versao: 0,
   });
@@ -64,6 +70,7 @@ export function CartaoTexto({
       setExibido({
         procedimentoId,
         texto,
+        segmentos,
         realce:
           mesmoProcedimento && texto !== null
             ? linhasAlteradas(exibido.texto, texto)
@@ -80,13 +87,14 @@ export function CartaoTexto({
         setExibido((atual) => ({
           procedimentoId,
           texto,
+          segmentos,
           realce: [],
           versao: atual.versao + 1,
         })),
       SAIDA_MS,
     );
     return () => clearTimeout(t);
-  }, [saindo, procedimentoId, texto]);
+  }, [saindo, procedimentoId, texto, segmentos]);
 
   function alternarCadeado() {
     if (!edicao.aberta) {
@@ -99,7 +107,9 @@ export function CartaoTexto({
   }
 
   const realcadas = new Set(exibido.realce);
-  const linhas = exibido.texto?.split("\n") ?? [];
+  const linhas = dividirEmLinhas(
+    exibido.segmentos ?? [{ texto: exibido.texto ?? "" }],
+  );
 
   return (
     <Ficha
@@ -173,8 +183,20 @@ export function CartaoTexto({
                 key={realcadas.has(i) ? `r${exibido.versao}-${i}` : i}
                 className={realcadas.has(i) ? "realce-linha" : undefined}
               >
-                {linha}
-                {i < linhas.length - 1 ? "\n" : ""}
+                {linha.map((s, j) =>
+                  s.destaque ? (
+                    <span
+                      key={j}
+                      className={
+                        s.ausente ? "destaque-ausente" : "destaque-escolha"
+                      }
+                    >
+                      {s.texto}
+                    </span>
+                  ) : (
+                    s.texto
+                  ),
+                )}
               </span>
             ))}
           </div>
