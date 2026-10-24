@@ -77,6 +77,51 @@ Movimento que responde a ação (o centro do pedido de "transições suaves"):
 
 Sem animação automática na carga das páginas além do fade de 160ms. Sem hover que levanta cartões. Hover de linha de lista = fundo `--campo-suave`.
 
+## Ícones
+
+- Biblioteca: `lucide-react` (já instalada). Traço 1.75, tamanho 16px em botões e links, 18px em títulos de ficha, 32px em estados vazios (dentro de um círculo `--campo-suave`).
+- Ícone acompanha o texto, não o substitui — exceto onde o espaço exige (Sair no celular, ações por linha no celular), sempre com `aria-label`. Ícones decorativos têm `aria-hidden`.
+- Cor: herda o texto (`currentColor`); em `--campo` só no link ativo e na ação primária.
+- Mapa:
+
+| Onde | Ícone |
+|---|---|
+| Link Gerar | `ClipboardList` |
+| Link Procedimentos | `Scissors` |
+| Link Profissionais | `Users` |
+| Sair | `LogOut` |
+| Campo Procedimento / combobox | `Scissors` + `ChevronsUpDown` |
+| Campo Cirurgião | `UserRound` |
+| Campo Anestesista | `Syringe` |
+| Campo Peso | `Weight` |
+| Busca | `Search` |
+| Novo / Adicionar | `Plus` |
+| Editar | `Pencil` |
+| Salvar | `Save` (ou `Check` em salvamento inline) |
+| Excluir | `Trash2` |
+| Copiar / Copiado | `Copy` / `Check` |
+| Ficha cirúrgica | `Scissors` |
+| Ficha anestésica | `Syringe` |
+| Selo "sem descrição anestésica" | `CircleAlert` |
+| Estado vazio de procedimentos | `FileText` |
+| Estado vazio de profissionais | `Users` |
+| Página não encontrada / erro | `SearchX` / `TriangleAlert` |
+| Login | `KeyRound` no campo Senha |
+
+## Edição livre do texto gerado (cadeado)
+
+Cada ficha da tela Gerar tem um **cadeado** no cabeçalho, ao lado de Copiar.
+
+- **Fechado (padrão):** o texto é gerado automaticamente pelas escolhas; não editável.
+- **Aberto:** o corpo da ficha vira uma área de texto (Literata, mesma aparência do documento, com fundo `--campo-suave` sutil e anel de foco) iniciada com o texto atual. O usuário edita livremente; **Copiar copia o texto editado**. Mudanças nas escolhas (procedimento, profissionais, peso) **não sobrescrevem** a edição — abaixo do texto aparece a nota "Edição livre. Feche o cadeado para voltar ao texto gerado."
+- **Fechar de novo:** descarta a edição e volta ao texto gerado, com o crossfade de troca de texto. Se o texto foi alterado, pede confirmação ("Descartar edição?" / "O texto volta a ser gerado pelas escolhas." / Cancelar · Descartar).
+- Trocar de **procedimento** com a ficha aberta: mantém aberta e mantém a edição (o usuário decide fechar).
+- A edição **nunca é salva** (vive só no estado da tela; nada de paciente persiste — spec §2).
+- Cada ficha tem seu próprio cadeado.
+- Rótulos acessíveis: "Editar texto livremente" (fechado) / "Bloquear e voltar ao texto gerado" (aberto); `aria-pressed`.
+
+**Animação do cadeado** (o segundo momento de movimento do app, depois do Copiar): ícone SVG próprio (`src/components/icone-cadeado.tsx`) com corpo e haste separados. Abrir: a haste sobe 3px e gira −25° em torno do pino esquerdo (220ms, curva padrão), com leve "clique" de escala do corpo 1 → 0.92 → 1 (160ms). Fechar: movimento inverso. A faixa verde da ficha passa de `--campo` para listrada diagonal `--campo`/`--campo-suave` enquanto aberta (sinal de "em edição"). Transição entre texto e área de texto: crossfade 160ms. Tudo reduzido a troca instantânea com `prefers-reduced-motion`.
+
 ## Componentes compartilhados (criados na T012)
 
 - `CabecalhoPagina({ titulo, descricao?, acao? })` — título 26/600, descrição opcional em `--tinta-suave`, ação à direita.
