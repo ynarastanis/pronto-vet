@@ -39,7 +39,7 @@ export function ListaProfissionais({ profissionais }: { profissionais: Profissio
   const por = (papel: Papel) => profissionais.filter((p) => p.papel === papel);
 
   return (
-    <div className="grid gap-8 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
       <Coluna
         titulo="Cirurgiões"
         vazio={{

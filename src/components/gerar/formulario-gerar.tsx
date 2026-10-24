@@ -118,11 +118,11 @@ export function FormularioGerar({
   }, [procedimento, cirurgiao, anestesista, peso]);
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
       <form
         aria-label="Escolhas"
         onSubmit={(e) => e.preventDefault()}
-        className="grid gap-4 rounded-xl border bg-card p-4 md:grid-cols-2 lg:sticky lg:top-20 lg:grid-cols-1"
+        className="grid grid-cols-1 gap-4 rounded-xl border bg-card p-4 md:grid-cols-2 lg:sticky lg:top-20 lg:grid-cols-1"
       >
         <div className="flex min-w-0 flex-col gap-2 md:col-span-2 lg:col-span-1">
           <Label htmlFor="procedimento">
@@ -174,7 +174,7 @@ export function FormularioGerar({
         </div>
       </form>
 
-      <div className="grid min-w-0 gap-4 md:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
         <CartaoTexto
           titulo="Descrição Cirúrgica"
           icone={<Scissors aria-hidden className="size-[18px]" />}

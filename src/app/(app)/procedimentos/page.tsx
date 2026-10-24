@@ -76,7 +76,7 @@ export default async function PaginaProcedimentos({
                 href={`/procedimentos/${p.id}`}
                 className="flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-3 transition-colors hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
               >
-                <span className="min-w-0 font-medium">{p.nome}</span>
+                <span className="min-w-0 font-medium break-words">{p.nome}</span>
                 {!p.temDescricaoAnestesica && (
                   <Badge variant="outline">
                     <CircleAlert aria-hidden />

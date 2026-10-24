@@ -107,7 +107,7 @@ export function BotaoCopiar({
       variant="outline"
       onClick={copiar}
       disabled={!texto}
-      className="min-w-28 text-foreground"
+      className="text-foreground sm:min-w-28"
     >
       {copiado ? (
         <span key="copiado" className="check-copiado inline-flex items-center gap-1.5">

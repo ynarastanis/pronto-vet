@@ -96,7 +96,8 @@ export function BarraNavegacao() {
                 )}
               >
                 <Icone aria-hidden className="size-4 shrink-0" />
-                {rotulo}
+                {/* Abaixo de sm só o link ativo mostra o rótulo; os demais ficam só com ícone. */}
+                <span className={cn(!ativo && "sr-only sm:not-sr-only")}>{rotulo}</span>
               </Link>
             );
           })}
