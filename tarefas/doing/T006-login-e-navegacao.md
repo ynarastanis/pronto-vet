@@ -54,6 +54,25 @@ npm test           -> Test Files 7 passed (7), Tests 55 passed (55)
 npm run build      -> Compiled successfully; rotas /, /_not-found, /entrar; "ƒ Proxy (Middleware)"
 ```
 
+### Rodada 2
+
+- **Resumo:** (1) matcher do proxy trocado pela lista explícita do Revisor (`_next/static/`, `_next/image$`, `favicon\.ico$` e arquivos de primeiro nível por extensão); (2) comentário errado removido e substituído por um que remete à ADR-012; (3) criado o grupo `src/app/(app)/` com `layout.tsx` (`await exigirSessao()` + `BarraNavegacao`); `src/app/page.tsx` movido para `src/app/(app)/page.tsx`; o `layout.tsx` raiz não renderiza mais a barra, e o teste `caminho === "/entrar"` da barra foi removido por ficar sem função; (4) comentário em `exigirSessao` avisando que não pode ficar em `try/catch`. O item herdado (`APP_SECRET` só com espaços) já estava na rodada 1.
+- **Arquivos:** src/proxy.ts, src/lib/auth/sessao.ts, src/app/layout.tsx, src/app/(app)/layout.tsx, src/app/(app)/page.tsx (movido), src/components/barra-navegacao.tsx
+- **Commits:** d45510f
+- **Verificação manual** (`next dev` em porta livre + curl, `.env.local` de teste ignorado e removido ao final):
+  - Sem cookie: `/`, `/x.y`, `/procedimentos`, `/procedimentos/a.b`, `/index.rsc` e `/naoexiste` -> 307 `/entrar`. `/favicon.ico`, `/file.svg` e um chunk de `/_next/static/` -> 200; `/entrar` -> 200.
+  - 404 sem sessão (`/nada.svg`, caminho que o proxy deixa passar): 404 com "Página não encontrada" e sem `nav` "Principal" (sem barra).
+  - Cenários da rodada 1 repetidos: senha errada -> "Senha incorreta." em ~1,09 s; senha certa -> 303 `/` com cookie HttpOnly, SameSite=lax, Max-Age=2592000; com cookie, `/` tem barra (Gerar, Sair) e `/entrar` -> 307 `/`; cookie adulterado -> 307 `/entrar`; Sair -> cookie expirado, 303 `/entrar`, depois `/` -> 307; `APP_PASSWORD` vazia -> nem senha vazia nem a antiga entram (~1,06 s). Com cookie, `/procedimentos`, `/x.y` etc. dão 404 (páginas ainda não existem), sem redirecionamento.
+  - Não verificado: aparência no navegador.
+- **Saída de lint / typecheck / testes:**
+
+```
+npm run lint       -> sem erros
+npm run typecheck  -> sem erros (rodado após o build; logo após o dev, .next/types velho apontava src/app/page.js)
+npm test           -> Test Files 7 passed (7), Tests 55 passed (55)
+npm run build      -> Compiled successfully; "ƒ /" (dinâmica), "○ /_not-found", "○ /entrar"; "ƒ Proxy (Middleware)"
+```
+
 ## Revisão
 
 <!-- preenchido pelo Revisor (Opus, sessão limpa) -->
