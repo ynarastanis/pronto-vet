@@ -1,6 +1,6 @@
 # T007 — Cadastro de profissionais
 
-- **Status:** a fazer
+- **Status:** implementando
 - **Prioridade:** P2
 - **Depende de:** T003, T005, T006, T012
 - **Referência na spec:** §5, §7
