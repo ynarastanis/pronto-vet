@@ -1,11 +1,18 @@
 "use client";
 
+import { TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Erro({ retry }: { error: unknown; retry: () => void }) {
   return (
     <main className="entrar-fade flex flex-1 items-center justify-center px-4 py-10">
       <div className="w-full max-w-md rounded-xl border bg-card px-5 py-6">
+        <span
+          aria-hidden
+          className="mb-3 flex size-14 items-center justify-center rounded-full bg-accent text-primary [&_svg]:size-8"
+        >
+          <TriangleAlert />
+        </span>
         <h1 className="text-xl font-semibold">Não foi possível carregar a página</h1>
         <p className="mt-1 text-muted-foreground">
           Ocorreu uma falha inesperada. Tente novamente; se continuar, recarregue o navegador.

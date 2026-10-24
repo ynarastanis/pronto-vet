@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { criarProfissional } from "@/actions/profissionais";
@@ -36,6 +37,7 @@ export function FormularioProfissional() {
         erros={erros}
       />
       <Button type="submit" disabled={pendente} className="sm:mt-[1.625rem]">
+        <Plus aria-hidden />
         {pendente ? "Adicionando…" : "Adicionar"}
       </Button>
     </form>

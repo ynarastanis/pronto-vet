@@ -1,5 +1,6 @@
 "use client";
 
+import { Save } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { atualizarProcedimento, criarProcedimento } from "@/actions/procedimentos";
@@ -80,6 +81,7 @@ export function FormularioProcedimento({
       </Campo>
       <div>
         <Button type="submit" disabled={pendente}>
+          <Save aria-hidden />
           {pendente ? "Salvando…" : "Salvar"}
         </Button>
       </div>

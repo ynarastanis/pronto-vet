@@ -1,3 +1,4 @@
+import { FileText } from "lucide-react";
 import Link from "next/link";
 import { CabecalhoPagina } from "@/components/cabecalho-pagina";
 import { EstadoVazio } from "@/components/estado-vazio";
@@ -21,6 +22,7 @@ export default async function Home() {
       />
       {procedimentos.length === 0 ? (
         <EstadoVazio
+          icone={<FileText />}
           titulo="Nenhum procedimento completo."
           descricao="Cadastre um procedimento com descrição anestésica."
           acao={

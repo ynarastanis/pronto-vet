@@ -1,5 +1,6 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import {
   AlertDialog,
@@ -37,6 +38,7 @@ export function ConfirmarExclusao({
   return (
     <AlertDialog open={aberto} onOpenChange={setAberto}>
       <AlertDialogTrigger render={<Button variant="ghost" size="sm" />}>
+        <Trash2 aria-hidden />
         {rotuloBotao}
       </AlertDialogTrigger>
       <AlertDialogContent>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Users } from "lucide-react";
 import { useState } from "react";
 import { EstadoVazio } from "@/components/estado-vazio";
 import type { Papel, Profissional } from "@/servicos/tipos";
@@ -20,7 +21,7 @@ function Coluna({
     <section>
       <h2 className="mb-3 text-base font-semibold">{titulo}</h2>
       {itens.length === 0 ? (
-        <EstadoVazio titulo={vazio.titulo} descricao={vazio.descricao} />
+        <EstadoVazio icone={<Users />} titulo={vazio.titulo} descricao={vazio.descricao} />
       ) : (
         <ul className="divide-y overflow-hidden rounded-xl border bg-card">
           {itens.map((p) => (

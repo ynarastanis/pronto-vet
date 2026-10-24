@@ -1,5 +1,6 @@
 "use client";
 
+import { Save } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { salvarDescricaoAnestesica } from "@/actions/procedimentos";
@@ -95,6 +96,7 @@ export function FormularioDescricaoAnestesica({
       ))}
       <div>
         <Button type="submit" disabled={pendente}>
+          <Save aria-hidden />
           {pendente ? "Salvando…" : "Salvar descrição anestésica"}
         </Button>
       </div>

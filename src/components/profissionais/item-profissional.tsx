@@ -1,5 +1,6 @@
 "use client";
 
+import { Pencil, Save } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { atualizarProfissional, excluirProfissional } from "@/actions/profissionais";
@@ -60,6 +61,7 @@ export function ItemProfissional({
             />
             <div className="flex gap-2 sm:mt-[1.625rem]">
               <Button type="submit" disabled={pendente}>
+                <Save aria-hidden />
                 {pendente ? "Salvando…" : "Salvar"}
               </Button>
               <Button type="button" variant="ghost" onClick={cancelar}>
@@ -72,6 +74,7 @@ export function ItemProfissional({
             <span className="min-w-0 truncate">{profissional.nome}</span>
             <div className="flex shrink-0 items-center gap-1">
               <Button variant="ghost" size="sm" onClick={() => setEditando(true)}>
+                <Pencil aria-hidden />
                 Editar
               </Button>
               <ConfirmarExclusao

@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { ClipboardList, LogOut, Scissors, Users } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { sair } from "@/actions/auth";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/", rotulo: "Gerar" },
-  { href: "/procedimentos", rotulo: "Procedimentos" },
-  { href: "/profissionais", rotulo: "Profissionais" },
+  { href: "/", rotulo: "Gerar", Icone: ClipboardList },
+  { href: "/procedimentos", rotulo: "Procedimentos", Icone: Scissors },
+  { href: "/profissionais", rotulo: "Profissionais", Icone: Users },
 ];
 
 function estaAtivo(href: string, caminho: string) {
@@ -81,7 +81,7 @@ export function BarraNavegacao() {
           className="relative -my-1 flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <span ref={pilula} aria-hidden className="pilula-ativa !top-1 !h-[calc(100%-0.5rem)]" />
-          {LINKS.map(({ href, rotulo }) => {
+          {LINKS.map(({ href, rotulo, Icone }) => {
             const ativo = estaAtivo(href, caminho);
             return (
               <Link
@@ -89,12 +89,13 @@ export function BarraNavegacao() {
                 href={href}
                 aria-current={ativo ? "page" : undefined}
                 className={cn(
-                  "relative flex h-10 shrink-0 items-center rounded-lg px-2 text-[13px] transition-colors duration-[180ms] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:px-2.5 sm:text-sm md:px-3",
+                  "relative flex h-10 shrink-0 items-center gap-1.5 rounded-lg px-2 text-[13px] transition-colors duration-[180ms] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:px-2.5 sm:text-sm md:px-3",
                   ativo
                     ? "font-medium text-primary"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground",
                 )}
               >
+                <Icone aria-hidden className="size-4 shrink-0" />
                 {rotulo}
               </Link>
             );
@@ -107,7 +108,7 @@ export function BarraNavegacao() {
             aria-label="Sair"
             className="flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg text-sm text-muted-foreground sm:px-2.5 transition-colors duration-[180ms] outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
-            <LogOut aria-hidden className="size-4 sm:hidden" />
+            <LogOut aria-hidden className="size-4" />
             <span className="hidden sm:inline">Sair</span>
           </button>
         </form>

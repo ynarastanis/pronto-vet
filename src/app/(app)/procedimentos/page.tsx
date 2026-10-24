@@ -1,3 +1,4 @@
+import { CircleAlert, FileText, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { CabecalhoPagina } from "@/components/cabecalho-pagina";
 import { EstadoVazio } from "@/components/estado-vazio";
@@ -23,6 +24,7 @@ export default async function PaginaProcedimentos({
         titulo="Procedimentos"
         acao={
           <Link href="/procedimentos/novo" className={buttonVariants()}>
+            <Plus aria-hidden />
             Novo procedimento
           </Link>
         }
@@ -37,12 +39,14 @@ export default async function PaginaProcedimentos({
           autoComplete="off"
         />
         <Button type="submit" variant="outline">
+          <Search aria-hidden />
           Buscar
         </Button>
       </form>
       {procedimentos.length === 0 ? (
         busca ? (
           <EstadoVazio
+            icone={<Search />}
             titulo="Nenhum procedimento encontrado."
             descricao="Confira a grafia ou busque por outra parte do nome."
             acao={
@@ -53,10 +57,12 @@ export default async function PaginaProcedimentos({
           />
         ) : (
           <EstadoVazio
+            icone={<FileText />}
             titulo="Nenhum procedimento cadastrado."
             descricao="Cadastre o primeiro procedimento para gerar as descrições do prontuário."
             acao={
               <Link href="/procedimentos/novo" className={buttonVariants()}>
+                <Plus aria-hidden />
                 Novo procedimento
               </Link>
             }
@@ -72,7 +78,10 @@ export default async function PaginaProcedimentos({
               >
                 <span className="min-w-0 font-medium">{p.nome}</span>
                 {!p.temDescricaoAnestesica && (
-                  <Badge variant="outline">sem descrição anestésica</Badge>
+                  <Badge variant="outline">
+                    <CircleAlert aria-hidden />
+                    sem descrição anestésica
+                  </Badge>
                 )}
               </Link>
             </li>

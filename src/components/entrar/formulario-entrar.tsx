@@ -1,5 +1,6 @@
 "use client";
 
+import { KeyRound } from "lucide-react";
 import { useActionState } from "react";
 import { entrar } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,10 @@ export function FormularioEntrar() {
   return (
     <form action={acao} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="senha">Senha</Label>
+        <Label htmlFor="senha">
+          <KeyRound aria-hidden className="size-4 text-muted-foreground" />
+          Senha
+        </Label>
         <Input
           id="senha"
           name="senha"
