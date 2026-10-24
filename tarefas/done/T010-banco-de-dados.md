@@ -1,6 +1,6 @@
 # T010 — Banco Neon e implementação Prisma dos serviços
 
-- **Status:** implementando
+- **Status:** concluída
 - **Prioridade:** P1
 - **Depende de:** T005–T009 e checkpoint de validação aprovado pelo usuário
 - **Referência na spec:** §5, §9, §11, §13
