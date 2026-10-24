@@ -78,3 +78,14 @@ Não verificado visualmente (sem navegador nesta etapa): aparência em 1280/375p
   - [ ] `src/app/not-found.tsx:8` — o título agora é "Página não encontrada" (sem ponto), mas o Passo 2 da T008 espera ver "Página não encontrada.". — Ajustar o texto do plano da T008 para o título atual (preferível) ou repor o ponto.
   - [ ] `src/app/global-error.tsx:8` — sem `Tema` e sem as variáveis das fontes, a página fica sempre clara e em `system-ui`. Aceitável para erro global; se quiser, aplicar `onest.variable` no `<html>`.
   - [ ] Para T009: `--copiado` (`#2FA676`) sobre branco dá 3,07:1 — serve como preenchimento da faixa (não texto), mas não deve ser usado como cor de texto do rótulo "Copiado".
+
+### Rodada 2
+
+- **Barra (decisão 1):** abaixo de `sm` a marca fica oculta (`hidden sm:flex`), "Sair" vira só o ícone `LogOut` em botão `min-w-10` com `aria-label="Sair"` (rótulo visível a partir de `sm`), links `px-2 text-[13px] sm:px-2.5 sm:text-sm`, `<nav>` com `gap-2 sm:gap-3`. Pelas medidas do Revisor (253px de conteúdo em 280px disponíveis a 360px) cabe sem corte; não conferi visualmente.
+- **`overflow-x` (2):** removido do `body`; estouro agora aparece em vez de ficar escondido.
+- **Pílula (3):** além da lista, o `ResizeObserver` observa cada link e `document.fonts.ready` dispara novo `posicionar()`.
+- **Movimento (4):** `globals.css` ganhou `.trocar-texto-saida` (120ms), `.check-copiado` (escala 0.9→1), `.erro-campo` (fade + altura via grid 0fr→1fr), `.item-lista` / `.item-lista-saida` (fade + altura; conteúdo em um único filho direto). Cobertos pela regra global de `prefers-reduced-motion`.
+- **Foco na Ficha (5):** `Ficha` recebe a classe `ficha` e `.ficha :focus-visible { --tw-ring-offset-color: var(--card) }`.
+- **Commits:** ver `git log --grep T012`.
+- **Saída:** `npm run lint` e `npm run typecheck` sem erros; `npm test` 7 arquivos, 55 testes passando; `npm run build` compilou (ƒ /, ○ /_not-found, ○ /entrar).
+- **Não verificado visualmente:** barra a 360/375px, deslize da pílula, utilitários de movimento (ainda sem uso nas telas), offset de foco na Ficha. O critério "sem rolagem horizontal em 360px" fica com o Líder.
