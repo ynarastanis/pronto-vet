@@ -13,6 +13,7 @@
 ## Restrições globais
 
 - Todo texto visível ao usuário em **português do Brasil**, com acentuação.
+- UI segue `docs/design/sistema-visual.md` (ADR-013); tarefas de UI carregam o skill `frontend-design:frontend-design`.
 - Versões: `next@16.4.x`, `prisma`/`@prisma/client`/`@prisma/adapter-neon@7.10.x` (**não** usar a 8.0 rc, que está na tag `latest` do npm), `zod@4.x`, `vitest@5.x`, `tailwindcss@4.x`, `shadcn@4.x`. Seguir a documentação oficial dessas versões (Next 16 usa `src/proxy.ts` exportando `proxy`; Prisma 7 usa `prisma.config.ts`, generator `prisma-client` com `output` e driver adapter obrigatório).
 - Dependências permitidas além das acima: as que o `shadcn` instala, `server-only`, `dotenv`, `tsx`. Qualquer outra → registrar ADR em `ARCHITECT.md` antes.
 - Testes: apenas unitários de funções (`src/**/*.test.ts`), Vitest, ambiente `node`.
@@ -45,6 +46,7 @@ T001 ─┬─ T002 ─┬──────────────────
 
 - T002, T003 e T004 podem rodar em paralelo após T001. T005 precisa dos tipos de T002 e T003; T006 precisa de T003 e T004 — T005 e T006 podem rodar em paralelo.
 - T007 e T008 podem rodar em paralelo (arquivos disjuntos). T009 depende de T002, T005 e T006.
+- **T012 (tema visual)** roda depois da T006 e antes de T007, T008 e T009.
 - **⏸ Checkpoint:** após T009 o Líder para; o usuário valida a experiência localmente com o mock. T010 só começa com o aval.
 
 ## Mapa de arquivos
@@ -418,6 +420,37 @@ export async function sair(): Promise<void>; // encerrarSessao(); redirect("/ent
   - com `APP_PASSWORD` vazia no `.env` → nenhuma senha entra (inclusive vazia)
 - [ ] **Passo 3: Rodar** `npm test && npm run lint && npm run typecheck && npm run build` → OK.
 - [ ] **Passo 4: Commit** — `T006: adiciona login por senha compartilhada e barra de navegação`.
+
+---
+
+### Task T012: Tema visual e componentes base
+
+> Executada **depois da T006 e antes das T007–T009** (o número reflete a ordem de criação, não de execução).
+
+**Files:**
+- Modify: `src/app/globals.css`, `src/app/layout.tsx`, `src/components/barra-navegacao.tsx`, `src/app/entrar/page.tsx`, `src/components/entrar/formulario-entrar.tsx`, `src/app/error.tsx`, `src/app/global-error.tsx`, `src/app/not-found.tsx`, `src/app/(app)/page.tsx` (só estilo do provisório)
+- Create: `src/components/tema.tsx` (ThemeProvider do `next-themes`), `src/components/cabecalho-pagina.tsx`, `src/components/estado-vazio.tsx`, `src/components/ficha.tsx`
+
+**Interfaces:**
+- Consumes: `docs/design/sistema-visual.md` (fonte da verdade de cores, tipos, raios, movimento e texto).
+- Produces:
+
+```tsx
+export function CabecalhoPagina(props: { titulo: string; descricao?: string; acao?: React.ReactNode }): JSX.Element;
+export function EstadoVazio(props: { titulo: string; descricao: string; acao?: React.ReactNode }): JSX.Element;
+export function Ficha(props: { titulo: string; acao?: React.ReactNode; copiado?: boolean; children: React.ReactNode }): JSX.Element;
+  // copiado=true dispara a varredura da faixa (.varredura-copiado); faixa esquerda 6px em --primary
+// globals.css: tokens claro/escuro mapeados nas variáveis do shadcn; --font-sans = Onest; --font-documento = Literata;
+// utilitários .entrar-fade, .realce-linha, .varredura-copiado, .pilula-ativa; bloco @media (prefers-reduced-motion: reduce)
+```
+
+- [ ] **Passo 1:** carregar o skill `frontend-design:frontend-design` e ler `docs/design/sistema-visual.md` inteiro.
+- [ ] **Passo 2:** tokens de cor (claro e escuro) e raios em `globals.css`; fontes Onest e Literata em `layout.tsx` (remover Geist); `ThemeProvider` com `attribute="class"`, `defaultTheme="system"`, `enableSystem`, `disableTransitionOnChange`; `suppressHydrationWarning` no `<html>`.
+- [ ] **Passo 3:** utilitários de movimento conforme a seção "Movimento" do sistema visual, com `prefers-reduced-motion`.
+- [ ] **Passo 4:** componentes `CabecalhoPagina`, `EstadoVazio`, `Ficha`.
+- [ ] **Passo 5:** reestilizar a barra (marca "■ Pronto Vet", pílula ativa deslizante, Sair discreto), `/entrar` (ficha centralizada com a faixa verde, título "Pronto Vet", texto de apoio "Digite a senha da equipe para entrar."), páginas de erro e 404.
+- [ ] **Passo 6: Verificar** — `npm run lint && npm run typecheck && npm test && npm run build` → OK. Subir `next dev` com `.env.local` de teste e, se houver navegador disponível, capturar telas de `/entrar` e `/` em 1280px e 375px, claro e escuro; senão, descrever o que não foi verificado visualmente.
+- [ ] **Passo 7: Commit** — `T012: aplica sistema visual verde e componentes base`.
 
 ---
 
