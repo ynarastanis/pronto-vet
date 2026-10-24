@@ -1,6 +1,6 @@
 # T013 — Edição livre com cadeado e ícones no app
 
-- **Status:** implementando
+- **Status:** concluída
 - **Prioridade:** P1
 - **Depende de:** T009, T012
 - **Referência:** `docs/design/sistema-visual.md` › "Edição livre do texto gerado (cadeado)" e "Ícones"; spec §2 e §7
