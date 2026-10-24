@@ -1,6 +1,6 @@
 # T012 — Tema visual e componentes base
 
-- **Status:** implementando
+- **Status:** em revisão
 - **Prioridade:** P1
 - **Depende de:** T006 (executar antes de T007, T008 e T009)
 - **Referência:** `docs/design/sistema-visual.md`, ADR-013
@@ -22,6 +22,8 @@ Aplicar o sistema visual verde (tokens claro/escuro, Onest + Literata, raios, ut
 - [x] `npm run lint`, `npm run typecheck` e `npm test` passando
 
 ## Notas do Líder
+
+**Conferência visual do Líder (rodada 2):** 360px escuro — Gerar 16–66px, Procedimentos 68–175, Profissionais 177–270, Sair (ícone) 304–344; sem rolagem horizontal; nada cortado. ok.
 
 **Decisões da rodada 1 (para a rodada 2):**
 1. Bloqueante: aplicar a correção da barra proposta pelo Revisor (marca oculta abaixo de `sm`, Sair só com ícone `LogOut` + `aria-label` abaixo de `sm`, links `px-2 text-[13px] sm:px-2.5 sm:text-sm`, `gap-2 sm:gap-3`).
