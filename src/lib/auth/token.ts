@@ -39,7 +39,7 @@ export async function assinarToken(
   segredo: string | undefined,
   expiraEm: number,
 ): Promise<string> {
-  if (!segredo) throw new Error("APP_SECRET não configurado");
+  if (!segredo?.trim()) throw new Error("APP_SECRET não configurado");
   if (!Number.isSafeInteger(expiraEm) || expiraEm <= 0) throw new Error("expiraEm inválido");
   const chave = await importarChave(segredo);
   const assinatura = await crypto.subtle.sign(
@@ -57,7 +57,7 @@ export async function verificarToken(
   agora: number,
 ): Promise<boolean> {
   try {
-    if (!token || !segredo) return false;
+    if (!token || !segredo?.trim()) return false;
     const partes = token.split(".");
     if (partes.length !== 2) return false;
     const [textoExpiracao, textoAssinatura] = partes;

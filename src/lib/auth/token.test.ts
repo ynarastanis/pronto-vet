@@ -63,6 +63,12 @@ describe("token de sessão", () => {
     await expect(assinarToken("", 1)).rejects.toThrow("APP_SECRET não configurado");
     await expect(assinarToken(undefined, 1)).rejects.toThrow("APP_SECRET não configurado");
   });
+
+  it("trata segredo só com espaços como não configurado", async () => {
+    const token = await assinarToken(SEGREDO, 2000);
+    expect(await verificarToken(token, "   ", 0)).toBe(false);
+    await expect(assinarToken("   ", 1)).rejects.toThrow("APP_SECRET não configurado");
+  });
 });
 
 describe("senhaConfere", () => {
