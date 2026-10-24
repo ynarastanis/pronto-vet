@@ -14,7 +14,6 @@ const LINKS = [
 
 export function BarraNavegacao() {
   const caminho = usePathname();
-  if (caminho === "/entrar") return null;
 
   return (
     <header className="border-b bg-background">

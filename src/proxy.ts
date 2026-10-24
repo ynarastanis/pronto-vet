@@ -16,7 +16,9 @@ export async function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// "[.]" em vez de "\." porque o path-to-regexp do Next descarta a barra invertida.
+// Exclui só assets estáticos de primeiro nível (lista explícita); ver ADR-012.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon[.]ico|.*[.].*).*)"],
+  matcher: [
+    "/((?!_next/static/|_next/image$|favicon\\.ico$|[^/]+\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest)$).*)",
+  ],
 };

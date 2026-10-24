@@ -21,7 +21,10 @@ export async function encerrarSessao(): Promise<void> {
   jar.delete(NOME_COOKIE);
 }
 
-/** Primeira linha de TODA Server Action: sessão inválida redireciona para /entrar. */
+/**
+ * Primeira linha de TODA Server Action: sessão inválida redireciona para /entrar.
+ * Não pode ficar dentro de try/catch (redirect() lança NEXT_REDIRECT).
+ */
 export async function exigirSessao(): Promise<void> {
   const jar = await cookies();
   const token = jar.get(NOME_COOKIE)?.value;
