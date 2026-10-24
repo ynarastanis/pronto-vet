@@ -1,6 +1,6 @@
 # T001 — Base do projeto
 
-- **Status:** implementando
+- **Status:** em revisão
 - **Prioridade:** P1
 - **Depende de:** nenhuma
 - **Referência na spec:** §4, §11, §12
