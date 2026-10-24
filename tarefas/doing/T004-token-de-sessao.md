@@ -1,6 +1,6 @@
 # T004 — Token de sessão e verificação de senha
 
-- **Status:** implementando
+- **Status:** em revisão
 - **Prioridade:** P1
 - **Depende de:** T001
 - **Referência na spec:** §8
