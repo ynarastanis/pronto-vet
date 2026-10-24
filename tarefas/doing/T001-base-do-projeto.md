@@ -50,6 +50,25 @@ npm run build      -> Next.js 16.4.3 (Turbopack) Compiled successfully; rotas: /
 curl localhost:3000 (next dev) -> <h1>Gerar</h1>, <html lang="pt-BR">; /nao-existe -> 404
 ```
 
+### Rodada 2
+
+- **O que mudou (decisões do Líder, ADR-010/011):**
+  1. `src/app/error.tsx` usa `retry()` (desvio do plano, que citava `reset()`; ver ADR-011).
+  2. `cacheComponents` e `partialPrefetching` removidos de `next.config.ts`; nota em `CLAUDE.md` › Notas do Next.js atualizada (ADR-010).
+  3. Textos em pt-BR em `src/components/ui/`: "Paleta de comandos", "Busque um comando...", "Fechar" (sr-only e botão do rodapé do dialog). Não há outros textos em inglês nesses componentes.
+  4. Novo `src/app/global-error.tsx` (`<html lang="pt-BR"><body>`, importa `globals.css`, mesmo texto do `error.tsx`, usa `retry()`).
+  5. `error.tsx` e `global-error.tsx` usam `Button` do shadcn (variant outline).
+  6. `shadcn` movido para `devDependencies` (`package-lock.json` regenerado).
+- **Commit:** 199ee8a
+- **Saída real:**
+
+```
+npm run lint       -> eslint . (exit 0, sem erros)
+npm run typecheck  -> tsc --noEmit (exit 0, sem erros)
+npm test           -> Test Files 1 passed (1) | Tests 1 passed (1)
+npm run build      -> Next.js 16.4.3 (Turbopack) Compiled successfully; rotas: / (static), /_not-found (static)
+```
+
 ## Revisão
 
 <!-- preenchido pelo Revisor (Opus, sessão limpa) -->
