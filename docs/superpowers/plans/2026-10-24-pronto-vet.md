@@ -1,6 +1,6 @@
 # Pronto Vet — Plano de Implementação
 
-> **Para agentes:** a execução segue o workflow de `AGENTS.md` (Implementador Sonnet por tarefa → Revisor Opus em sessão limpa), equivalente a superpowers:subagent-driven-development. Cada task abaixo corresponde a um arquivo `tarefas/todo/T<NNN>-*.md`. Passos usam checkbox (`- [ ]`).
+> **Para agentes:** a execução segue o workflow de `AGENTS.md` (Implementador Sonnet por tarefa → Líder roda lint, typecheck, testes e build). Cada task abaixo corresponde a um arquivo `tarefas/todo/T<NNN>-*.md`. Passos usam checkbox (`- [ ]`).
 
 **Objetivo:** app web em pt-BR para cadastrar profissionais e procedimentos (descrição cirúrgica + descrição anestésica) e gerar os dois textos de prontuário para copiar separadamente.
 

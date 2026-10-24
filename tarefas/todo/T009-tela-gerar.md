@@ -43,11 +43,3 @@ Tela principal: escolher procedimento, profissionais e peso; prévias dos dois t
 ```
 ```
 
-## Revisão
-
-<!-- preenchido pelo Revisor (Opus, sessão limpa) -->
-
-- **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [ ] `arquivo:linha` — …

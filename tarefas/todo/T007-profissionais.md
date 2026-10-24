@@ -39,11 +39,3 @@ Pode rodar em paralelo com T008. Quem chegar primeiro cria src/components/confir
 ```
 ```
 
-## Revisão
-
-<!-- preenchido pelo Revisor (Opus, sessão limpa) -->
-
-- **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [ ] `arquivo:linha` — …

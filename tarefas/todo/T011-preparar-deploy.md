@@ -34,11 +34,3 @@ O deploy em si depende da conta do usuário — não faz parte desta tarefa.
 ```
 ```
 
-## Revisão
-
-<!-- preenchido pelo Revisor (Opus, sessão limpa) -->
-
-- **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [ ] `arquivo:linha` — …

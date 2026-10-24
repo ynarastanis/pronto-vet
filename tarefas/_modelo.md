@@ -1,6 +1,6 @@
 # T<NNN> — <título>
 
-- **Status:** a fazer | implementando | em revisão | concluída
+- **Status:** a fazer | implementando | concluída
 - **Prioridade:** P1 | P2 | P3
 - **Depende de:** T<NNN>, … (ou "nenhuma")
 - **Referência na spec:** seção <n>
@@ -12,7 +12,7 @@
 ## Critérios de aceite
 
 - [ ] …
-- [ ] `npm run lint`, `npm run typecheck` e `npm test` passando
+- [ ] `npm run lint`, `npm run typecheck`, `npm test` e `npm run build` passando
 
 ## Notas do Líder
 
@@ -32,11 +32,3 @@
 ```
 ```
 
-## Revisão
-
-<!-- preenchido pelo Revisor (Opus, sessão limpa) -->
-
-- **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [ ] `arquivo:linha` — …

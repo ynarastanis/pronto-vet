@@ -43,11 +43,3 @@ PRÉ-REQUISITOS: checkpoint de validação aprovado; o Líder pede ao usuário a
 ```
 ```
 
-## Revisão
-
-<!-- preenchido pelo Revisor (Opus, sessão limpa) -->
-
-- **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [ ] `arquivo:linha` — …
