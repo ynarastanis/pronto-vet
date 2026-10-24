@@ -1,6 +1,6 @@
 # T004 — Token de sessão e verificação de senha
 
-- **Status:** em revisão
+- **Status:** implementando
 - **Prioridade:** P1
 - **Depende de:** T001
 - **Referência na spec:** §8
@@ -18,6 +18,12 @@ assinarToken, verificarToken e senhaConfere com Web Crypto, falhando fechado sem
 - [x] `npm run lint`, `npm run typecheck` e `npm test` passando
 
 ## Notas do Líder
+
+**Decisão após a rodada 1 (aprovada):** as 4 sugestões opcionais do Revisor entram numa rodada 2 curta, por serem de segurança e baratas:
+1. `deBase64Url` recusa base64url não canônico (`paraBase64Url(bytes) !== texto` → inválido) + teste.
+2. Teste de adulteração troca um caractere do **meio** da assinatura.
+3. `senhaConfere`: `APP_PASSWORD` só com espaços conta como não configurada (`!esperada?.trim()`) + teste.
+4. `assinarToken` lança `Error("expiraEm inválido")` se `expiraEm` não for inteiro positivo (`Number.isSafeInteger` e > 0) + teste.
 
 Pode rodar em paralelo com T002 e T003.
 
@@ -44,6 +50,13 @@ npm test          -> Test Files 5 passed (5); Tests 31 passed (31)
 <!-- preenchido pelo Revisor (Opus, sessão limpa) -->
 
 - **Rodada:** 1
-- **Veredito:** aprovado | alterações solicitadas
-- **Apontamentos:**
-  - [ ] `arquivo:linha` — …
+- **Veredito:** aprovado
+- **Verificação (rodada pelo Revisor):** `npx vitest run src/lib/auth` → 9/9 passando; `npm run lint` sem erros; `npm run typecheck` sem erros; `npm test` → 5 arquivos, 31 testes passando. Commit revisado: 09efee6 (`src/lib/auth/token.ts`, `src/lib/auth/token.test.ts`).
+- **Conformidade:** interfaces idênticas ao plano (Task T004); só `crypto.subtle` (sem `node:crypto`); funções puras recebendo segredo e "agora" (spec §8, ADR-003); todos os testes do Passo 1 presentes; mensagens em pt-BR.
+- **Foco de revisão item 4 (falhar fechado):** confirmado. `APP_SECRET` ausente/vazio → `assinarToken` rejeita e `verificarToken` retorna `false`; `APP_PASSWORD` ausente/vazia → `senhaConfere` retorna `false` para qualquer senha, inclusive vazia. `verificarToken` está todo dentro de `try/catch`; NaN, frações, zeros à esquerda e expiração adulterada são recusados.
+- **Apontamentos bloqueantes:** nenhum.
+- **Sugestões opcionais (não bloqueiam):**
+  - [ ] `src/lib/auth/token.ts:22` — `deBase64Url` aceita base64url não canônico: os 2 bits finais do 43º caractere são ignorados, então 3 variações do último caractere de um token válido também são aceitas (verificado: para o token do teste, `x`, `y` e `z` no lugar de `w`). Não permite forjar nem estender sessão (exige token válido), mas o token fica maleável. — Recusar se `paraBase64Url(bytes) !== texto` ou exigir comprimento 43.
+  - [ ] `src/lib/auth/token.test.ts:18` — "recusa assinatura adulterada" só passa porque o último caractere atual (`w`) muda para `A`, que altera bits significativos; trocar por um caractere que só altere os bits ignorados faria o teste falhar. — Adulterar um caractere do meio da assinatura (ou o primeiro).
+  - [ ] `src/lib/auth/token.ts:84` — `APP_PASSWORD` só com espaços (`" "`) é tratada como configurada e aceita `" "` como senha. Pela letra do plano não é "vazia"; se a intenção for falhar fechado também nesse caso, usar `!esperada?.trim()`. Decisão do Líder.
+  - [ ] `src/lib/auth/token.ts:41` — `assinarToken` aceita `expiraEm` não inteiro (`NaN`, `1.5`) e gera um token que nunca valida (falha fechado, sem risco). — Opcional: lançar se `!Number.isSafeInteger(expiraEm)`, para o erro aparecer no T006 em vez de um login que "não pega".
