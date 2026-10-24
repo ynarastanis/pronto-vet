@@ -1,6 +1,6 @@
 # T003 — Schemas de validação (Zod)
 
-- **Status:** implementando
+- **Status:** em revisão
 - **Prioridade:** P1
 - **Depende de:** T001
 - **Referência na spec:** §9
