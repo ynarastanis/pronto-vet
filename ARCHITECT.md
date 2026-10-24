@@ -108,3 +108,25 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
   4. `neon.ts` (política de branches) fica versionado; `@neon/config` é `devDependency` (só tipa o `neon.ts`). `@neon/env`, adicionado pelo `neon init`, foi removido por não ser usado. A pasta `.neon` (vínculo local) fica no `.gitignore`.
   5. `neon init` rodou com `--no-agent-setup`: o plugin/MCP do Neon não foi instalado no Claude Code do usuário, para não ligar a conta da Ynara à configuração global dele.
 - **Consequências:** nenhuma variável renomeada à mão na Vercel; a T010 lê `DATABASE_URL` no runtime e `DATABASE_URL_UNPOOLED` nas migrations.
+
+## ADR-015 — CI no GitHub Actions, deploy pela integração da Vercel, uma tarefa por PR
+
+- **Status:** aceita (2026-10-24)
+- **Contexto:** o usuário aprovou o fluxo branch → PR → CI → Preview → merge → Production. Repositório privado no GitHub Free (sem proteção de branch). Vercel Hobby e Neon Free.
+- **Decisão:**
+  1. **CI** (`.github/workflows/ci.yml`): lint, typecheck, test e build em todo PR para `main` e todo push em `main`. Build da CI com `FONTE_DADOS=memoria` e segredos falsos — sem banco.
+  2. **Deploy**: integração Git nativa da Vercel. Cada PR gera um Preview; cada merge no `main` gera Production. Nada de deploy por Actions.
+  3. **Banco por Preview**: integração Neon ↔ Vercel com branch do Neon por Preview (apagado ao fechar o PR). Production usa o branch `production`.
+  4. **Migrations** rodam no build da Vercel (`prisma migrate deploy && next build`, a partir da T010).
+  5. **Uma tarefa = um branch `tNNN-slug` = um PR.** Merge só com a CI verde — garantido pelo processo (o Líder confere `gh pr checks`), pois a proteção de branch exige GitHub Pro em repositório privado.
+  6. Variáveis na Vercel:
+
+| Variável | Production | Preview | Origem |
+|---|---|---|---|
+| `DATABASE_URL` | branch `production` | branch do PR | integração Neon |
+| `DATABASE_URL_UNPOOLED` | branch `production` | branch do PR | integração Neon |
+| `APP_PASSWORD` | senha da equipe | outra senha | usuário |
+| `APP_SECRET` | segredo A | segredo B | usuário |
+| `FONTE_DADOS` | não definir | não definir | — |
+
+- **Consequências:** todo código chega ao `main` por PR com CI verde e preview conferível. Até a T010, deploys da Vercel sobem sem banco (páginas com dados falham em runtime) — esperado.

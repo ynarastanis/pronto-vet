@@ -36,7 +36,7 @@ A conferência visual no navegador é feita **pelo usuário** (decisão de 2026-
 tarefas/
   todo/    # aprovadas pelo Líder, ordenadas por prioridade (P1, P2, P3) e ID
   doing/   # em implementação
-  done/    # portões de qualidade verdes
+  done/    # portões verdes; entra no main via PR
   _modelo.md
 ```
 
@@ -44,12 +44,23 @@ tarefas/
 - Mover cartão = mover o arquivo (`git mv`) e atualizar o campo `Status`.
 - Só o **Líder** cria tarefas e move de `todo` → `doing` e `doing` → `done`.
 
+## Branches, PR e CI (ADR-015)
+
+- Uma tarefa = um branch `tNNN-slug` criado a partir do `main` atualizado = um PR. Ajustes pequenos sem tarefa usam um branch `ajuste-<slug>`.
+- Ninguém commita direto no `main`. A proteção de branch não está disponível (repositório privado no GitHub Free), então a regra é do processo.
+- O Implementador só commita no branch; **push, PR e merge são do Líder**.
+- Antes de qualquer `git push` ou `gh`, o Líder confere `gh auth status`: a conta ativa precisa ser `ynarastanis`. Senão, `gh auth switch --user ynarastanis`.
+- **Merge** só com a CI verde (`gh pr checks <n>` todo verde) e, para mudanças de UI ou de banco, depois de o usuário conferir o Preview da Vercel no link do PR. Merge com `gh pr merge --squash --delete-branch`.
+- Comandos da CLI do Neon sempre com `--profile ynara` (ADR-014).
+
 ## Ciclo de uma tarefa
 
-1. **Líder** escolhe a tarefa de maior prioridade em `todo/` com dependências concluídas, move para `doing/` com `Status: implementando`.
+1. **Líder** escolhe a tarefa de maior prioridade em `todo/` com dependências concluídas, cria o branch `tNNN-slug` a partir do `main` atualizado, move o arquivo para `doing/` com `Status: implementando` e commita no branch.
 2. **Líder** despacha o **Implementador** (Sonnet) com o caminho do arquivo da tarefa.
-3. **Implementador** lê a tarefa, a spec e `CLAUDE.md`; implementa em TDD; roda lint, typecheck, testes e build; faz commit(s) `T<NNN>: ...`; preenche a seção *Implementação*. Retorna ao Líder.
-4. **Líder** roda os portões de qualidade. Verde → move para `done/` com `Status: concluída`. Vermelho → devolve ao Implementador.
+3. **Implementador** lê a tarefa, a spec e `CLAUDE.md`; implementa em TDD; roda lint, typecheck, testes e build; faz commit(s) `T<NNN>: ...` no branch; preenche a seção *Implementação*. Retorna ao Líder.
+4. **Líder** roda os portões localmente. Vermelho → devolve ao Implementador.
+5. Verde → **Líder** move a tarefa para `done/` com `Status: concluída` (commit no branch), faz push, abre o PR (`gh pr create`, corpo em pt-BR com o resumo da tarefa) e acompanha a CI.
+6. CI verde (e Preview conferido pelo usuário, quando aplicável) → **Líder** faz o merge e volta o checkout local para o `main` atualizado.
 
 ## Escalonamento ao usuário
 
