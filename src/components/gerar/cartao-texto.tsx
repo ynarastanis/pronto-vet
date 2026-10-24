@@ -107,6 +107,7 @@ export function CartaoTexto({
       icone={icone}
       copiado={copiado}
       emEdicao={edicao.aberta}
+      notaEdicao="Edição livre. Feche o cadeado para voltar ao texto gerado."
       acao={
         <div className="flex shrink-0 items-center gap-2">
           <Button
@@ -156,9 +157,6 @@ export function CartaoTexto({
               className="texto-documento block min-h-64 w-full resize-y rounded-lg border border-edicao-fio bg-transparent p-3 outline-none [field-sizing:content] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
             />
           </div>
-          <p className="mt-2 text-[13px] text-muted-foreground">
-            Edição livre. Feche o cadeado para voltar ao texto gerado.
-          </p>
         </div>
       ) : exibido.texto === null ? (
         <p className="text-muted-foreground">

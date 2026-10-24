@@ -411,3 +411,25 @@
 svg.lucide {
   stroke-width: 1.75;
 }
+
+/* Nota da edição livre sob o título da ficha: fade + altura (grid 0fr para 1fr). */
+.nota-ficha {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--duracao) var(--curva),
+    opacity var(--duracao) var(--curva),
+    visibility 0s linear var(--duracao);
+}
+.nota-ficha[data-visivel="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.nota-ficha > * {
+  min-height: 0;
+  overflow: hidden;
+}
