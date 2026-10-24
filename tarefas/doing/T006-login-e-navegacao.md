@@ -1,6 +1,6 @@
 # T006 — Login, proxy e barra de navegação
 
-- **Status:** a fazer
+- **Status:** implementando
 - **Prioridade:** P1
 - **Depende de:** T003, T004 (pode rodar em paralelo com T005)
 - **Referência na spec:** §7, §8
