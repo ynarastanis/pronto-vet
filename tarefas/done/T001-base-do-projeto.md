@@ -1,6 +1,6 @@
 # T001 — Base do projeto
 
-- **Status:** em revisão
+- **Status:** concluída
 - **Prioridade:** P1
 - **Depende de:** nenhuma
 - **Referência na spec:** §4, §11, §12
@@ -84,3 +84,19 @@ npm run build      -> Next.js 16.4.3 (Turbopack) Compiled successfully; rotas: /
   - [ ] `next.config.ts:5` — `cacheComponents: true` muda a semântica de leitura dinâmica (cookies da sessão, dados por request exigem `<Suspense>`/`connection()`), o que afeta T006–T009. — Registrar como ADR em `ARCHITECT.md` ou alertar nas tarefas seguintes; hoje só consta em `CLAUDE.md`.
   - [ ] `package.json:24` — `shadcn` está em `dependencies` (só é usado pelo `@import "shadcn/tailwind.css"` no build). — Mover para `devDependencies` é opcional; não afeta a Vercel.
   - [ ] `src/app/error.tsx:7` — botão HTML cru em vez de `Button` de `@/components/ui/button`. — Usar o componente para manter o visual consistente.
+
+### Rodada 2
+
+- **Rodada:** 2
+- **Veredito:** aprovado
+- **Verificação do Revisor:** `npm run lint` (exit 0), `npm run typecheck` (exit 0), `npm test` (exit 0; 1 arquivo, 1 teste), `npm run build` (Next.js 16.4.3, `/` e `/_not-found` estáticas). Árvore limpa após o build (`AGENTS.md` intacto). Diff completo dos commits `T001:` (33c6866, 199ee8a e os de registro) relido; `AGENTS.md`, `docs/`, `.claude/` não alterados por commits da tarefa; `ARCHITECT.md` só mudou no commit do Líder (e1ee1aa, ADR-010/011).
+- **Decisões da rodada 1:**
+  1. Bloqueante atendido — `src/app/error.tsx:5,10` usa `retry` com a assinatura `{ error: unknown; retry: () => void }` da doc local (`error.md`, seção `retry`), conforme ADR-011; desvio do plano registrado na implementação.
+  2. Atendido — `next.config.ts` sem `cacheComponents`/`partialPrefetching` (ADR-010); `CLAUDE.md:54` atualizado e cita ADR-010/011.
+  3. Atendido — `command.tsx:37-38` e `dialog.tsx:75,113` em pt-BR; varredura em `src/components/ui/` não achou outros textos visíveis/sr-only em inglês.
+  4. Atendido — `src/app/global-error.tsx` com `<html lang="pt-BR"><body>`, importa `globals.css`, mesmo texto do `error.tsx`, `retry()`.
+  5. Atendido — ambos usam `Button` (variant outline).
+  6. Atendido — `shadcn` em `devDependencies` (`package.json:34`); o `@import "shadcn/tailwind.css"` só é resolvido no build, e a Vercel instala devDependencies no build.
+- **Apontamentos bloqueantes:** nenhum.
+- **Sugestões (não bloqueantes):**
+  - [ ] `src/app/global-error.tsx:8` — não carrega as fontes Geist nem define `<title>` (a doc lembra que `metadata` não é suportado aqui). — Se quiser paridade visual, aplicar as variáveis de fonte e um `<title>Erro — Pronto Vet</title>`; aceitável como está.
