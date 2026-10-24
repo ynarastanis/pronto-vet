@@ -46,16 +46,21 @@ Conteúdo alinhado à esquerda; largura máxima 1120px; gutter 16px no celular, 
 ```
 O "■" é um pequeno quadrado verde-campo com cantos de 3px — a mesma faixa das fichas, em miniatura. Sem logotipo ilustrado.
 
-**Gerar (desktop ≥ 1024px):** painel de escolhas fixo à esquerda, fichas à direita.
+**Gerar:** escolhas numa **linha própria** no topo (superfície única), fichas abaixo. (Revisado em 2026-10-24 a pedido do usuário: o painel lateral ao lado das fichas ficava apertado.)
 ```
-┌─ Escolhas (300px, sticky) ─┐  ┌▌Descrição cirúrgica ─────── [Copiar] ┐ ┌▌Descrição anestésica ────── [Copiar] ┐
-│ Procedimento  [busca ▾]    │  │▌ PROCEDIMENTO CIRÚRGICO: ...          │ │▌ CIRURGIÃO: ...                       │
-│ Cirurgião     [▾]          │  │▌                                      │ │▌ ANESTESISTA: ...                     │
-│ Anestesista   [▾]          │  │▌ (Literata, documento)                │ │▌ Peso do paciente: 4,2 kg             │
-│ Peso (kg)     [    ]       │  │▌                                      │ │▌ ...                                  │
-└────────────────────────────┘  └───────────────────────────────────────┘ └───────────────────────────────────────┘
+┌─ Escolhas ────────────────────────────────────────────────────────────────────────────────────┐
+│ Procedimento [busca ▾]        Cirurgião [digite…]        Anestesista [digite…]     Peso [   ] │
+│                               (Ana) (Bruno) (Carla)      (Dr. Lima) (Dra. Reis)               │
+└───────────────────────────────────────────────────────────────────────────────────────────────┘
+┌▌Descrição cirúrgica ──────────── [🔒] [Copiar] ┐  ┌▌Descrição anestésica ─────────── [🔒] [Copiar] ┐
+│▌ PROCEDIMENTO CIRÚRGICO: ...                    │  │▌ CIRURGIÃO: ...                                 │
+│▌ (Literata, documento)                          │  │▌ Peso do paciente: 4,2 kg                       │
+└─────────────────────────────────────────────────┘  └─────────────────────────────────────────────────┘
 ```
-Entre 768 e 1023px: escolhas em grade de 2 colunas no topo, fichas lado a lado abaixo. Abaixo de 768px: tudo empilhado, fichas em coluna única.
+- Escolhas: ≥ 1024px em 4 colunas (`minmax(0,2fr) minmax(0,1.5fr) minmax(0,1.5fr) minmax(0,1fr)`); 640–1023px em 2 colunas; < 640px em 1 coluna. Não é sticky.
+- Fichas: lado a lado a partir de 1024px; empilhadas abaixo disso.
+
+**Seleção de profissionais (typeahead):** Cirurgião e Anestesista são campos de texto com sugestões enquanto digita (lista filtrada pelo papel, sem diferenciar maiúsculas nem acentos, navegável por teclado, `role="combobox"`). Escolher uma sugestão fixa o profissional; o campo mostra o nome com um botão `X` para limpar. Abaixo do campo, **pills dos últimos profissionais escolhidos** daquele papel (até 4, mais recente primeiro, guardados em `localStorage` como lista de ids; ids que não existem mais são ignorados). Tocar numa pill seleciona o profissional; a pill do selecionado fica marcada (`--campo-suave`, borda `--campo`, `aria-pressed`). Ao abrir a tela, o mais recente vem pré-selecionado (comportamento anterior mantido).
 
 **Ficha** (o elemento memorável do app): fundo `--folha`, fio `--fio`, raio 14px, e uma **faixa vertical de 6px em `--campo` na borda esquerda** — o campo cirúrgico sobre a folha. Cabeçalho da ficha: título 16/600 em `--tinta` + botão Copiar à direita. Corpo: texto em Literata com `white-space: pre-wrap`.
 
@@ -120,7 +125,7 @@ Cada ficha da tela Gerar tem um **cadeado** no cabeçalho, ao lado de Copiar.
 - Cada ficha tem seu próprio cadeado.
 - Rótulos acessíveis: "Editar texto livremente" (fechado) / "Bloquear e voltar ao texto gerado" (aberto); `aria-pressed`.
 
-**Animação do cadeado** (o segundo momento de movimento do app, depois do Copiar): ícone SVG próprio (`src/components/icone-cadeado.tsx`) com corpo e haste separados. Abrir: a haste sobe 3px e gira −25° em torno do pino esquerdo (220ms, curva padrão), com leve "clique" de escala do corpo 1 → 0.92 → 1 (160ms). Fechar: movimento inverso. A faixa verde da ficha passa de `--campo` para listrada diagonal `--campo`/`--campo-suave` enquanto aberta (sinal de "em edição"). Transição entre texto e área de texto: crossfade 160ms. Tudo reduzido a troca instantânea com `prefers-reduced-motion`.
+**Animação do cadeado** (o segundo momento de movimento do app, depois do Copiar): ícone SVG próprio (`src/components/icone-cadeado.tsx`) com corpo e haste separados. Abrir: a haste sobe 3px e gira −25° em torno do pino esquerdo (220ms, curva padrão), com leve "clique" de escala do corpo 1 → 0.92 → 1 (160ms). Fechar: movimento inverso. O ícone mostra o cadeado **aberto enquanto a ficha está em edição** e fechado fora dela — o desenho sempre corresponde ao estado. **Modo de edição em azul** (revisado em 2026-10-24 a pedido do usuário; substitui a faixa listrada): a ficha inteira troca para tons de azul — tokens `--edicao` (faixa e anel: claro `#2F6DB0`, escuro `#7FB0EA`), `--edicao-suave` (fundo da ficha e da área de texto: claro `#EEF4FB`, escuro `#132338`), `--edicao-fio` (borda: claro `#B7CDEA`, escuro `#2A4466`). A troca de cor é uma transição de 220ms de `background-color`/`border-color`. O cadeado aberto usa `--edicao`. Texto em `--tinta` continua com contraste AA sobre `--edicao-suave` (verificar). Transição entre texto e área de texto: crossfade 160ms. Tudo reduzido a troca instantânea com `prefers-reduced-motion`.
 
 ## Componentes compartilhados (criados na T012)
 
