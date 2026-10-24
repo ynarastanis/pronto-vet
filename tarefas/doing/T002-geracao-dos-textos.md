@@ -12,9 +12,9 @@ Funções puras gerarTextoCirurgico e gerarTextoAnestesico, em TDD, conforme o f
 
 ## Critérios de aceite
 
-- [ ] Todos os testes listados no plano, com os valores exatos
-- [ ] \r\n normalizado, opcionais vazios/só espaços omitidos, peso vazio vira --, sem "kg kg"
-- [ ] `npm run lint`, `npm run typecheck` e `npm test` passando
+- [x] Todos os testes listados no plano, com os valores exatos
+- [x] \r\n normalizado, opcionais vazios/só espaços omitidos, peso vazio vira --, sem "kg kg"
+- [x] `npm run lint`, `npm run typecheck` e `npm test` passando
 
 ## Notas do Líder
 
@@ -26,12 +26,18 @@ Pode rodar em paralelo com T003 e T004.
 
 <!-- preenchido pelo Implementador (Sonnet) -->
 
-- **Resumo:**
-- **Arquivos:**
-- **Commits:**
+- **Resumo:** normalizarTexto (
+ e  para 
+, trim, null vira ""), gerarTextoCirurgico e gerarTextoAnestesico como funções puras; peso sem sufixo kg duplicado, "--" para ausentes, opcionais vazios omitidos. 10 testes (4 cirúrgico, 6 anestésico).
+- **Arquivos:** src/lib/texto/{tipos,normalizar,cirurgico,anestesico}.ts, cirurgico.test.ts, anestesico.test.ts
+- **Commits:** 1d579ab (T002: adiciona geração dos textos cirúrgico e anestésico), mais o commit de preenchimento desta seção
 - **Saída de lint / typecheck / testes:**
 
 ```
+npx vitest run src/lib/texto -> 2 files, 10 tests passed
+npm run lint      -> sem erros
+npm run typecheck -> sem erros
+npm test          -> 5 files, 31 tests passed (inclui arquivos de outras tarefas)
 ```
 
 ## Revisão
