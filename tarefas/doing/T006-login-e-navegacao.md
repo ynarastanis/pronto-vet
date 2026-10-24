@@ -12,10 +12,10 @@ Página /entrar, actions entrar/sair, exigirSessao, proxy.ts protegendo as rotas
 
 ## Critérios de aceite
 
-- [ ] Todos os cenários da verificação manual do plano conferidos e descritos na Implementação
-- [ ] Senha errada responde após ~1 s com "Senha incorreta."
-- [ ] `npm run build` passando
-- [ ] `npm run lint`, `npm run typecheck` e `npm test` passando
+- [x] Todos os cenários da verificação manual do plano conferidos e descritos na Implementação
+- [x] Senha errada responde após ~1 s com "Senha incorreta."
+- [x] `npm run build` passando
+- [x] `npm run lint`, `npm run typecheck` e `npm test` passando
 
 ## Notas do Líder
 
@@ -29,12 +29,23 @@ Página /entrar, actions entrar/sair, exigirSessao, proxy.ts protegendo as rotas
 
 <!-- preenchido pelo Implementador (Sonnet) -->
 
-- **Resumo:**
-- **Arquivos:**
-- **Commits:**
+- **Resumo:** Item herdado: `assinarToken`/`verificarToken` tratam `APP_SECRET` só com espaços como não configurado (TDD). Login: `sessao.ts` (criarSessao/encerrarSessao/exigirSessao), `proxy.ts`, actions `entrar`/`sair`, página `/entrar` com `FormularioEntrar` (useActionState) e `BarraNavegacao` (client, oculta em `/entrar`, link ativo destacado, botão Sair) no layout. Desvio de implementação: o matcher do proxy usa `[.]` em vez de `\.`, porque o path-to-regexp do Next descartava a barra invertida e o proxy só rodava em `/`.
+- **Arquivos:** src/lib/auth/token.ts, token.test.ts, sessao.ts; src/proxy.ts; src/actions/auth.ts; src/app/entrar/page.tsx; src/app/layout.tsx; src/components/entrar/formulario-entrar.tsx; src/components/barra-navegacao.tsx
+- **Commits:** 88c9930 (APP_SECRET), bb69ae7 (login e navegação)
+- **Verificação manual** (`next dev` + curl, `.env.local` ignorado pelo git, removido ao final; Server Action submetida via multipart com os campos `$ACTION_*` do HTML):
+  - Verificado: `/` sem cookie -> 307 `/entrar`; `/procedimentos` sem cookie -> 307 `/entrar`; `/favicon.ico` não é redirecionado.
+  - Verificado: senha errada e senha vazia -> "Senha incorreta." após ~1,07 s; `/entrar` sem barra de navegação.
+  - Verificado: senha certa -> 303 para `/`; cookie `sessao` com HttpOnly, SameSite=lax, Path=/, Max-Age=2592000 (sem Secure em dev); `/` mostra Gerar/Procedimentos/Profissionais/Sair; `/entrar` com cookie -> 307 `/`; cookie adulterado -> 307 `/entrar`.
+  - Verificado: Sair -> cookie expirado, 303 `/entrar`; `/` depois -> 307 `/entrar`.
+  - Verificado: com `APP_PASSWORD` vazia, nem senha vazia nem qualquer outra (inclusive a antiga) entra.
+  - Não verificado (sem navegador): aparência/responsividade, destaque visual do link ativo, rótulo "Entrando…" durante o envio, foco automático. `Secure` em produção só por leitura do código.
 - **Saída de lint / typecheck / testes:**
 
 ```
+npm run lint       -> sem erros
+npm run typecheck  -> sem erros
+npm test           -> Test Files 7 passed (7), Tests 55 passed (55)
+npm run build      -> Compiled successfully; rotas /, /_not-found, /entrar; "ƒ Proxy (Middleware)"
 ```
 
 ## Revisão
@@ -44,4 +55,4 @@ Página /entrar, actions entrar/sair, exigirSessao, proxy.ts protegendo as rotas
 - **Rodada:** 1
 - **Veredito:** aprovado | alterações solicitadas
 - **Apontamentos:**
-  - [ ] `arquivo:linha` — …
+  - [x] `arquivo:linha` — …
