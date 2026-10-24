@@ -4,7 +4,7 @@ export function EstadoVazio({
   descricao,
   acao,
 }: {
-  /** Ícone lucide de 32px, mostrado dentro de um círculo --campo-suave. */
+  /** Ícone lucide de 2rem (32px na base), mostrado dentro de um círculo --campo-suave. */
   icone?: React.ReactNode;
   titulo: string;
   descricao: string;

@@ -165,13 +165,13 @@ export function FormularioGerar({
       <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
         <CartaoTexto
           titulo="Descrição Cirúrgica"
-          icone={<IconeMascara aria-hidden className="size-[18px]" />}
+          icone={<IconeMascara aria-hidden className="size-[1.125rem]" />}
           texto={textos?.cirurgico ?? null}
           procedimentoId={procedimentoId}
         />
         <CartaoTexto
           titulo="Descrição Anestésica"
-          icone={<Syringe aria-hidden className="size-[18px]" />}
+          icone={<Syringe aria-hidden className="size-[1.125rem]" />}
           texto={textos?.anestesico ?? null}
           procedimentoId={procedimentoId}
         />

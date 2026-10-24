@@ -20,7 +20,7 @@ export function MensagemErro({ id, texto }: { id: string; texto?: string }) {
   if (!texto) return null;
   return (
     <div className="erro-campo">
-      <p id={id} role="alert" className="text-[13px] text-destructive">
+      <p id={id} role="alert" className="text-[0.8125rem] text-destructive">
         {texto}
       </p>
     </div>

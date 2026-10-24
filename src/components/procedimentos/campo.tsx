@@ -20,10 +20,10 @@ export function Campo({
         {rotulo}
       </Label>
       {children}
-      {ajuda && <p className="text-[13px] text-muted-foreground">{ajuda}</p>}
+      {ajuda && <p className="text-[0.8125rem] text-muted-foreground">{ajuda}</p>}
       {erro && (
         <div className="erro-campo">
-          <p id={`erro-${id}`} role="alert" className="text-[13px] text-destructive">
+          <p id={`erro-${id}`} role="alert" className="text-[0.8125rem] text-destructive">
             {erro}
           </p>
         </div>

@@ -10,7 +10,7 @@ export function CabecalhoPagina({
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
       <div className="min-w-0">
-        <h1 className="text-[26px] leading-tight font-semibold tracking-[-0.01em]">
+        <h1 className="text-[1.625rem] leading-tight font-semibold tracking-[-0.01em]">
           {titulo}
         </h1>
         {descricao && (

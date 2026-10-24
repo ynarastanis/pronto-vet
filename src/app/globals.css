@@ -45,12 +45,12 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   /* Hierarquia de raios: fichas 14 > superfícies 12 > controles 8. */
-  --radius-sm: 6px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 14px;
-  --radius-3xl: 16px;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 0.875rem;
+  --radius-3xl: 1rem;
   --radius-4xl: 9999px;
 }
 
@@ -82,7 +82,7 @@
   --chart-3: #5b6e67;
   --chart-4: #d5e2db;
   --chart-5: #14231e;
-  --radius: 8px;
+  --radius: 0.5rem;
   --sidebar: #ffffff;
   --sidebar-foreground: #14231e;
   --sidebar-primary: #0e5c4d;
@@ -141,6 +141,7 @@
   html {
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
+    font-size: 100%;
   }
   body {
     @apply bg-background text-foreground;
@@ -157,7 +158,7 @@
 /* Texto do prontuário: único lugar com serifa, lê como documento. */
 .texto-documento {
   font-family: var(--font-documento);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.65;
   max-width: 72ch;
   white-space: pre-wrap;
@@ -244,7 +245,7 @@
 /* Linha alterada do texto gerado: realce que esmaece em 600ms. */
 .realce-linha {
   animation: pv-realce 600ms var(--curva) both;
-  border-radius: 4px;
+  border-radius: 0.25rem;
 }
 
 /* Troca de procedimento: texto entra em 200ms com deslocamento de 4px (usar com key). */
@@ -315,7 +316,7 @@
   top: 0;
   left: 0;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   background: var(--accent);
   pointer-events: none;
   opacity: 0;
@@ -432,4 +433,12 @@ svg.lucide {
 .nota-ficha > * {
   min-height: 0;
   overflow: hidden;
+}
+
+/* Escala em telas grandes: a raiz cresce com a largura (1024px = 16px, 1600px+ = 24px);
+   tudo em rem acompanha. Ver docs/design/sistema-visual.md. Sem a propriedade zoom. */
+@media (min-width: 1024px) {
+  html {
+    font-size: clamp(16px, 1.778px + 1.389vw, 24px);
+  }
 }

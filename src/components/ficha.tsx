@@ -15,7 +15,7 @@ export function Ficha({
   children,
 }: {
   titulo: string;
-  /** Ícone decorativo de 18px ao lado do título. */
+  /** Ícone decorativo de 1.125rem ao lado do título. */
   icone?: React.ReactNode;
   acao?: React.ReactNode;
   copiado?: boolean;
@@ -48,7 +48,7 @@ export function Ficha({
             data-visivel={emEdicao ? "true" : "false"}
             aria-hidden={!emEdicao}
           >
-            <p className="flex items-start gap-1.5 pt-1.5 text-[13px] text-edicao">
+            <p className="flex items-start gap-1.5 pt-1.5 text-[0.8125rem] text-edicao">
               <PencilLine aria-hidden className="mt-px size-3.5 shrink-0" />
               <span className="min-w-0">{notaEdicao}</span>
             </p>

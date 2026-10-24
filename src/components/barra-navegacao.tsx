@@ -67,13 +67,13 @@ export function BarraNavegacao() {
     <header className="sticky top-0 z-30 h-14 border-b bg-card">
       <nav
         aria-label="Principal"
-        className="mx-auto flex h-full max-w-[1120px] items-center gap-2 px-4 sm:gap-3 md:gap-6 md:px-6"
+        className="mx-auto flex h-full max-w-[70rem] items-center gap-2 px-4 sm:gap-3 md:gap-6 md:px-6"
       >
         <Link
           href="/"
           className="hidden shrink-0 items-center gap-2 rounded-md font-semibold sm:flex outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
         >
-          <span aria-hidden className="size-4 rounded-[3px] bg-primary" />
+          <span aria-hidden className="size-4 rounded-[0.1875rem] bg-primary" />
           <span className="text-base">Pronto Vet</span>
         </Link>
 
@@ -90,7 +90,7 @@ export function BarraNavegacao() {
                 href={href}
                 aria-current={ativo ? "page" : undefined}
                 className={cn(
-                  "relative flex h-10 shrink-0 items-center gap-1.5 rounded-lg px-2 text-[13px] transition-colors duration-[180ms] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:px-2.5 sm:text-sm md:px-3",
+                  "relative flex h-10 shrink-0 items-center gap-1.5 rounded-lg px-2 text-[0.8125rem] transition-colors duration-[180ms] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:px-2.5 sm:text-sm md:px-3",
                   ativo
                     ? "font-medium text-primary"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground",
