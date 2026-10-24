@@ -1,6 +1,6 @@
 "use client";
 
-import { Syringe, UserRound, Weight } from "lucide-react";
+import { Slice, Syringe, UserRound, Weight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CampoProfissional } from "@/components/gerar/campo-profissional";
 import { CartaoTexto } from "@/components/gerar/cartao-texto";
@@ -165,7 +165,7 @@ export function FormularioGerar({
       <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
         <CartaoTexto
           titulo="Descrição Cirúrgica"
-          icone={<IconeMascara aria-hidden className="size-[1.125rem]" />}
+          icone={<Slice aria-hidden className="size-[1.125rem]" />}
           texto={textos?.cirurgico ?? null}
           procedimentoId={procedimentoId}
         />

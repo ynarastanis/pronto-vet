@@ -122,7 +122,7 @@ Sem animação automática na carga das páginas além do fade de 160ms. Sem hov
 | Salvar | `Save` (ou `Check` em salvamento inline) |
 | Excluir | `Trash2` |
 | Copiar / Copiado | `Copy` / `Check` |
-| Ficha cirúrgica | `IconeMascara` |
+| Ficha cirúrgica | `Slice` |
 | Ficha anestésica | `Syringe` |
 | Selo "sem descrição anestésica" | `CircleAlert` |
 | Estado vazio de procedimentos | `FileText` |
