@@ -1,6 +1,6 @@
 # T009 — Tela Gerar
 
-- **Status:** implementando
+- **Status:** concluída
 - **Prioridade:** P1
 - **Depende de:** T002, T005, T006, T012
 - **Referência na spec:** §7 (Tela Gerar)

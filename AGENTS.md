@@ -28,6 +28,8 @@ npm run lint && npm run typecheck && npm test && npm run build
 
 Tudo verde → tarefa concluída. Qualquer falha → volta ao Implementador com a saída do erro.
 
+A conferência visual no navegador é feita **pelo usuário** (decisão de 2026-10-24); o Líder não abre o navegador para conferir telas.
+
 ## Quadro de tarefas (`tarefas/`)
 
 ```
