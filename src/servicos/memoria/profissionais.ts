@@ -1,10 +1,11 @@
 import { ErroNaoEncontrado } from "../erros";
+import { compararNomes } from "../nomes";
 import type { Profissional, ServicoProfissionais } from "../tipos";
 
 export function criarServicoProfissionais(lista: Profissional[]): ServicoProfissionais {
   return {
     async listar() {
-      return structuredClone([...lista].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")));
+      return structuredClone([...lista].sort((a, b) => compararNomes(a.nome, b.nome)));
     },
     async criar(dados) {
       const novo: Profissional = { id: crypto.randomUUID(), nome: dados.nome, papel: dados.papel };
