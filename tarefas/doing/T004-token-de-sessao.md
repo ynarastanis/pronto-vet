@@ -12,10 +12,10 @@ assinarToken, verificarToken e senhaConfere com Web Crypto, falhando fechado sem
 
 ## Critérios de aceite
 
-- [ ] Só crypto.subtle (sem node:crypto)
-- [ ] verificarToken nunca lança
-- [ ] Sem APP_PASSWORD/APP_SECRET: nenhum acesso é concedido
-- [ ] `npm run lint`, `npm run typecheck` e `npm test` passando
+- [x] Só crypto.subtle (sem node:crypto)
+- [x] verificarToken nunca lança
+- [x] Sem APP_PASSWORD/APP_SECRET: nenhum acesso é concedido
+- [x] `npm run lint`, `npm run typecheck` e `npm test` passando
 
 ## Notas do Líder
 
@@ -27,12 +27,16 @@ Pode rodar em paralelo com T002 e T003.
 
 <!-- preenchido pelo Implementador (Sonnet) -->
 
-- **Resumo:**
-- **Arquivos:**
-- **Commits:**
+- **Resumo:** assinarToken, verificarToken e senhaConfere com Web Crypto (crypto.subtle, HMAC-SHA256 e SHA-256), sem node:crypto. verificarToken nunca lança (try/catch, valida formato, base64url e expiração, usa crypto.subtle.verify). Sem segredo/senha: assinarToken lança "APP_SECRET não configurado", verificarToken e senhaConfere retornam false. TDD: teste falhou (módulo inexistente) e depois passou.
+- **Arquivos:** src/lib/auth/token.ts, src/lib/auth/token.test.ts
+- **Commits:** 09efee6 T004: adiciona token HMAC de sessão e verificação de senha
 - **Saída de lint / typecheck / testes:**
 
 ```
+npx vitest run src/lib/auth -> 1 arquivo, 9 testes passando
+npm run lint      -> eslint . (sem erros)
+npm run typecheck -> tsc --noEmit (sem erros)
+npm test          -> Test Files 5 passed (5); Tests 31 passed (31)
 ```
 
 ## Revisão
