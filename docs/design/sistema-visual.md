@@ -132,6 +132,16 @@ Sem animação automática na carga das páginas além do fade de 160ms. Sem hov
 
 **Ícone de procedimento:** `ClipboardPlus` (lucide). A máscara própria foi descartada a pedido do usuário; cirurgia usa `Slice`.
 
+## Destaque das escolhas na ficha travada
+
+Com o cadeado **fechado**, os trechos do texto que vêm das escolhas da tela ficam destacados: **nome do procedimento, cirurgião, anestesista e peso**.
+
+- Estilo: fundo `--campo-suave`, peso 500, cantos de 0.25rem, sem padding horizontal que desloque o texto (usar `box-decoration-break: clone` e no máximo `0.0625rem` de padding vertical).
+- Escolha ainda não feita (`--`): sem fundo, sublinhado tracejado em `--tinta-suave`, sinalizando o que falta escolher.
+- O destaque é **só visual**: nenhum caractere a mais (sem `::before`/`::after` com `content`), então copiar — pelo botão ou selecionando à mão — produz exatamente o texto gerado.
+- Com o cadeado **aberto** não há destaque (é uma área de texto comum).
+- Convive com o `.realce-linha` (a linha alterada pisca por cima).
+
 ## Edição livre do texto gerado (cadeado)
 
 Cada ficha da tela Gerar tem um **cadeado** no cabeçalho, ao lado de Copiar.
