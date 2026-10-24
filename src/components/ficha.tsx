@@ -16,7 +16,7 @@ export function Ficha({
   return (
     <section
       data-copiado={copiado ? "true" : "false"}
-      className="relative min-w-0 overflow-hidden rounded-2xl border bg-card pl-1.5"
+      className="ficha relative min-w-0 overflow-hidden rounded-2xl border bg-card pl-1.5"
     >
       <span
         aria-hidden

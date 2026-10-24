@@ -137,7 +137,6 @@
     @apply bg-background text-foreground;
     font-size: 0.875rem;
     line-height: 1.5;
-    overflow-x: hidden;
   }
   h1,
   h2,
@@ -186,6 +185,48 @@
   }
 }
 
+@keyframes pv-sair {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pv-check {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pv-altura-entrar {
+  from {
+    opacity: 0;
+    grid-template-rows: 0fr;
+  }
+  to {
+    opacity: 1;
+    grid-template-rows: 1fr;
+  }
+}
+
+@keyframes pv-altura-sair {
+  from {
+    opacity: 1;
+    grid-template-rows: 1fr;
+  }
+  to {
+    opacity: 0;
+    grid-template-rows: 0fr;
+  }
+}
+
 /* Conteúdo da página: fade de 160ms, sem slide. */
 .entrar-fade {
   animation: pv-fade 160ms var(--curva) both;
@@ -200,6 +241,46 @@
 /* Troca de procedimento: texto entra em 200ms com deslocamento de 4px (usar com key). */
 .trocar-texto {
   animation: pv-entrar-4px 200ms var(--curva) both;
+}
+/* Saída do crossfade (120ms): aplicar ao texto antigo antes de trocar a key; some ao fim. */
+.trocar-texto-saida {
+  animation: pv-sair 120ms var(--curva) both;
+}
+
+/* Check do Copiar: entra com escala 0.9 para 1 e fade. */
+.check-copiado {
+  animation: pv-check 180ms var(--curva) both;
+}
+
+/* Erro de formulário: fade + altura (grid 0fr para 1fr), sem empurrar o campo de um golpe. */
+.erro-campo {
+  display: grid;
+  animation: pv-altura-entrar var(--duracao) var(--curva) both;
+}
+.erro-campo > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Item de lista: entra com fade + expansão de altura; .item-lista-saida colapsa ao excluir.
+   Envolver o conteúdo do item em um único filho direto. */
+.item-lista {
+  display: grid;
+  animation: pv-altura-entrar var(--duracao-entrada) var(--curva) both;
+}
+.item-lista-saida {
+  display: grid;
+  animation: pv-altura-sair var(--duracao) var(--curva) both;
+}
+.item-lista > *,
+.item-lista-saida > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Foco dentro da ficha: o offset do anel usa a cor da superfície. */
+.ficha :focus-visible {
+  --tw-ring-offset-color: var(--card);
 }
 
 /* Faixa esquerda da ficha: o preenchimento "copiado" varre de cima para baixo (420ms). */
