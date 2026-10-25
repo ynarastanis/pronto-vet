@@ -568,3 +568,8 @@ svg.lucide {
     background-image: none;
   }
 }
+
+/* Fundo animado da tela de login: surge com fade suave. */
+.fundo-campo {
+  animation: pv-fade 600ms var(--curva) both;
+}
