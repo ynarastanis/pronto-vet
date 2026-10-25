@@ -17,7 +17,7 @@ function estaAtivo(href: string, caminho: string) {
   return href === "/" ? caminho === "/" : caminho.startsWith(href);
 }
 
-export function BarraNavegacao() {
+export function BarraNavegacao({ ambiente }: { ambiente: string | null }) {
   const caminho = usePathname();
   const lista = useRef<HTMLDivElement>(null);
   const pilula = useRef<HTMLSpanElement>(null);
@@ -75,6 +75,12 @@ export function BarraNavegacao() {
           <span aria-hidden className="size-4 rounded-[0.1875rem] bg-primary" />
           <span className="text-base">Pronto Vet</span>
         </Link>
+
+        {ambiente && (
+          <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[0.6875rem] font-medium text-amber-900 dark:bg-amber-400/15 dark:text-amber-300">
+            {ambiente}
+          </span>
+        )}
 
         <div
           ref={lista}
