@@ -7,7 +7,7 @@ import { atualizarProfissional, excluirProfissional } from "@/actions/profission
 import { ConfirmarExclusao } from "@/components/confirmar-exclusao";
 import { Button } from "@/components/ui/button";
 import type { Papel, Profissional } from "@/servicos/tipos";
-import { CamposProfissional } from "./campos-profissional";
+import { CamposProfissional, RotuloFantasma } from "./campos-profissional";
 
 export function ItemProfissional({
   profissional,
@@ -59,14 +59,17 @@ export function ItemProfissional({
               aoMudarPapel={setPapel}
               erros={erros}
             />
-            <div className="flex gap-2 sm:mt-[1.625rem]">
-              <Button type="submit" disabled={pendente}>
-                <Save aria-hidden />
-                {pendente ? "Salvando…" : "Salvar"}
-              </Button>
-              <Button type="button" variant="ghost" onClick={cancelar}>
-                Cancelar
-              </Button>
+            <div className="flex flex-col gap-2">
+              <RotuloFantasma />
+              <div className="flex gap-2">
+                <Button type="submit" disabled={pendente}>
+                  <Save aria-hidden />
+                  {pendente ? "Salvando…" : "Salvar"}
+                </Button>
+                <Button type="button" variant="ghost" onClick={cancelar}>
+                  Cancelar
+                </Button>
+              </div>
             </div>
           </form>
         ) : (

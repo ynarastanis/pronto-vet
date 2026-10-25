@@ -27,6 +27,15 @@ export function MensagemErro({ id, texto }: { id: string; texto?: string }) {
   );
 }
 
+/** Rótulo invisível com a mesma altura do `Label`, para alinhar botões à linha dos campos. */
+export function RotuloFantasma() {
+  return (
+    <span aria-hidden className="invisible hidden text-sm leading-none font-medium sm:block">
+      &nbsp;
+    </span>
+  );
+}
+
 export function CamposProfissional({
   prefixo,
   nome,
