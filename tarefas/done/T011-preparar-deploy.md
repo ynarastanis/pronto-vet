@@ -1,6 +1,6 @@
 # T011 — Fechamento do deploy
 
-- **Status:** implementando
+- **Status:** concluída
 - **Prioridade:** P2
 - **Depende de:** T010, T014, T015
 - **Branch:** `t011-fechamento-deploy`
