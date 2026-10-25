@@ -151,3 +151,14 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
   2. Nenhum serviço usa `$transaction`; mas o Prisma abre transação implícita em `create`/`update` com `include` (escrita + leitura da relação). Em `ServicoProcedimentos`, `criar` devolve `descricaoAnestesica: null` (procedimento novo não tem) e `atualizar` lê a descrição em consulta separada. `upsert` de `DescricaoAnestesica` (chave única `procedimentoId`, igual no `where` e no `create`) vira `INSERT ... ON CONFLICT` nativo e funciona.
   3. O adapter HTTP não converte erros do Postgres: a violação de unicidade chega com `code: "23505"` (não `P2002`), sem `meta.target`; a restrição só aparece na mensagem (`..._nome_key`). `traduzirErroPrisma` trata esse formato para devolver `ErroNomeDuplicado`.
 - **Consequências:** qualquer futura escrita com relação aninhada ou `$transaction` exigirá voltar ao `PrismaNeon` (WebSocket) ou reestruturar a operação. Ganho medido é pequeno (ver tarefa T015).
+
+## ADR-018 — Um único projeto Neon: o criado pela integração da Vercel
+
+- **Status:** aceita (2026-10-25). Substitui, na ADR-014, o projeto `green-cherry-00787842` e os nomes de branch.
+- **Contexto:** a integração Neon ↔ Vercel não conseguiu vincular o projeto `green-cherry-00787842`; o usuário criou o banco pela Vercel, o que gerou o projeto `long-lab-10816041` (`pronto-vet-1`) na org Neon `org-patient-pond-01447185` ("Vercel: Personal"), região `aws-sa-east-1`. O desenvolvimento local continuava no projeto antigo.
+- **Decisão (opção A, escolhida pelo usuário):**
+  1. Projeto único: `long-lab-10816041`. Branch padrão `main` = Production. Branch `development` (criado de `main`) = `.env.local`. Branches `preview/<git-branch>` = Previews, criados pela integração.
+  2. Vínculo local: `neon init --profile ynara --org-id org-patient-pond-01447185 --project-id long-lab-10816041 --branch development --no-agent-setup`; variáveis com `neon env pull --profile ynara`.
+  3. O projeto `green-cherry-00787842` deixa de ser usado e será apagado após confirmação do usuário.
+  4. Região das funções na Vercel (São Paulo) e do banco (`sa-east-1`) coincidem.
+- **Consequências:** local, Preview e Production no mesmo projeto. `neon init` re-adiciona `@neon/env` ao `package.json` — descartar (ADR-014, item 4). Branches `preview/*` não são apagados automaticamente após o merge; limpar periodicamente com `neon branches delete --profile ynara --org-id org-patient-pond-01447185 --project-id long-lab-10816041 preview/<nome>`.
