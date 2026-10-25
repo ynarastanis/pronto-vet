@@ -15,6 +15,8 @@
   --color-edicao: var(--edicao);
   --color-edicao-suave: var(--edicao-suave);
   --color-edicao-fio: var(--edicao-fio);
+  --color-campo: var(--campo);
+  --color-campo-edicao: var(--campo-edicao);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -77,6 +79,9 @@
   --edicao: #2f6db0;
   --edicao-suave: #eef4fb;
   --edicao-fio: #b7cdea;
+  /* Fundo das áreas de texto: destoa do card/popover (campo) e da Ficha em edição (campo-edicao). */
+  --campo: #eaf1ee;
+  --campo-edicao: #ffffff;
   --chart-1: #0e5c4d;
   --chart-2: #2fa676;
   --chart-3: #5b6e67;
@@ -119,6 +124,8 @@
   --edicao: #7fb0ea;
   --edicao-suave: #132338;
   --edicao-fio: #2a4466;
+  --campo: #0a1511;
+  --campo-edicao: #0d1a2b;
   --chart-1: #5fd3a4;
   --chart-2: #4cc995;
   --chart-3: #93a9a0;

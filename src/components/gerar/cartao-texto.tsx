@@ -247,7 +247,7 @@ export function CartaoTexto({
                 aria-label={`${titulo}, texto em edição livre`}
                 value={edicao.texto}
                 onChange={(e) => setEdicao(editar(edicao, e.target.value))}
-                className="texto-documento block h-full w-full min-w-0 resize-none overflow-y-auto rounded-lg border border-edicao-fio bg-transparent p-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-popover"
+                className="texto-documento block h-full w-full min-w-0 resize-none overflow-y-auto rounded-lg border border-edicao-fio bg-campo-edicao p-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-popover"
               />
             ) : (
               <div className="h-full min-w-0 overflow-y-auto pr-1">
@@ -271,7 +271,7 @@ export function CartaoTexto({
               aria-label={`${titulo}, texto em edição livre`}
               value={edicao.texto}
               onChange={(e) => setEdicao(editar(edicao, e.target.value))}
-              className="texto-documento block min-h-64 w-full resize-y rounded-lg border border-edicao-fio bg-transparent p-3 outline-none [field-sizing:content] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+              className="texto-documento block min-h-64 w-full resize-y rounded-lg border border-edicao-fio bg-campo-edicao p-3 outline-none [field-sizing:content] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
             />
           </div>
         </div>
