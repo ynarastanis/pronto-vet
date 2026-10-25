@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { criarProfissional } from "@/actions/profissionais";
 import { Button } from "@/components/ui/button";
 import type { Papel } from "@/servicos/tipos";
-import { CamposProfissional } from "./campos-profissional";
+import { CamposProfissional, RotuloFantasma } from "./campos-profissional";
 
 export function FormularioProfissional() {
   const [nome, setNome] = useState("");
@@ -36,10 +36,13 @@ export function FormularioProfissional() {
         aoMudarPapel={setPapel}
         erros={erros}
       />
-      <Button type="submit" disabled={pendente} className="sm:mt-[1.625rem]">
-        <Plus aria-hidden />
-        {pendente ? "Adicionando…" : "Adicionar"}
-      </Button>
+      <div className="flex flex-col gap-2">
+        <RotuloFantasma />
+        <Button type="submit" disabled={pendente}>
+          <Plus aria-hidden />
+          {pendente ? "Adicionando…" : "Adicionar"}
+        </Button>
+      </div>
     </form>
   );
 }

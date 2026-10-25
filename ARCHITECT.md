@@ -141,3 +141,13 @@ Formato: **Contexto** · **Decisão** · **Consequências**.
   3. Listagem e busca de procedimentos e ordenação de profissionais são feitas em JS com `compararNomes` e `nomeContemTermo` (`src/servicos/nomes.ts`), compartilhadas com a memória: paridade exata de ordem pt-BR e de busca (acentos, maiúsculas, `%` e `_` literais) independentemente da collation do banco. O volume é pequeno.
   4. `build` continua `next build` (a CI não tem banco); `vercel-build` = `prisma generate && prisma migrate deploy && next build`. O seed é só local (`npm run db:seed`).
 - **Consequências:** nenhuma dependência de runtime fora da stack além do adapter Neon; trocar de collation ou de banco não muda o comportamento observável.
+
+## ADR-017 — Driver HTTP do Neon (`PrismaNeonHttp`) e escrita sem `include`
+
+- **Status:** aceita (2026-10-24), registrada pelo Implementador da T015 por pedido do Líder.
+- **Contexto:** a T015 pede menos latência por navegação. O adapter `@prisma/adapter-neon` 7.10.1 expõe `PrismaNeon` (WebSocket, `Pool`) e `PrismaNeonHttp` (uma requisição HTTP por consulta, sem conexão persistente), sem dependência nova. O HTTP não suporta transação (`startTransaction` lança "Transactions are not supported in HTTP mode").
+- **Decisão:**
+  1. `src/lib/db.ts` usa `new PrismaNeonHttp(DATABASE_URL, {})`.
+  2. Nenhum serviço usa `$transaction`; mas o Prisma abre transação implícita em `create`/`update` com `include` (escrita + leitura da relação). Em `ServicoProcedimentos`, `criar` devolve `descricaoAnestesica: null` (procedimento novo não tem) e `atualizar` lê a descrição em consulta separada. `upsert` de `DescricaoAnestesica` (chave única `procedimentoId`, igual no `where` e no `create`) vira `INSERT ... ON CONFLICT` nativo e funciona.
+  3. O adapter HTTP não converte erros do Postgres: a violação de unicidade chega com `code: "23505"` (não `P2002`), sem `meta.target`; a restrição só aparece na mensagem (`..._nome_key`). `traduzirErroPrisma` trata esse formato para devolver `ErroNomeDuplicado`.
+- **Consequências:** qualquer futura escrita com relação aninhada ou `$transaction` exigirá voltar ao `PrismaNeon` (WebSocket) ou reestruturar a operação. Ganho medido é pequeno (ver tarefa T015).
