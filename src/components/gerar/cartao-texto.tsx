@@ -222,7 +222,7 @@ export function CartaoTexto({
     >
       <Dialog open={ampliado} onOpenChange={setAmpliado}>
         <DialogContent
-          className={`w-[calc(100%-2rem)] max-w-3xl sm:max-w-3xl${classeTema ? ` ${classeTema}` : ""}`}
+          className={`h-[min(85dvh,48rem)] w-[calc(100%-2rem)] max-w-3xl grid-rows-[auto_minmax(0,1fr)] sm:max-w-3xl${classeTema ? ` ${classeTema}` : ""}`}
         >
           <DialogHeader className="min-w-0 pr-9">
             <div className="flex items-center justify-between gap-3">
@@ -241,16 +241,16 @@ export function CartaoTexto({
               </div>
             </div>
           </DialogHeader>
-          <div ref={alvoModalRef} className="min-w-0 text-base">
+          <div ref={alvoModalRef} className="h-full min-h-0 min-w-0 text-base">
             {edicao.aberta ? (
               <textarea
                 aria-label={`${titulo}, texto em edição livre`}
                 value={edicao.texto}
                 onChange={(e) => setEdicao(editar(edicao, e.target.value))}
-                className="texto-documento block h-[50vh] max-h-[70vh] w-full min-w-0 resize-y overflow-y-auto rounded-lg border border-edicao-fio bg-transparent p-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-popover"
+                className="texto-documento block h-full w-full min-w-0 resize-none overflow-y-auto rounded-lg border border-edicao-fio bg-transparent p-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-popover"
               />
             ) : (
-              <div className="max-h-[70vh] min-w-0 overflow-y-auto pr-1">
+              <div className="h-full min-w-0 overflow-y-auto pr-1">
                 <div className="texto-documento [overflow-wrap:anywhere]">
                   <LinhasDestacadas
                     segmentos={segmentos ?? [{ texto: texto ?? "" }]}
