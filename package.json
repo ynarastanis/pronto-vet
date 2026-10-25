@@ -13,7 +13,7 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx --conditions=react-server prisma/seed.ts",
-    "db:resetar-development-da-producao": "neon branches reset development --parent --profile ynara --org-id org-patient-pond-01447185 --project-id long-lab-10816041"
+    "db:reset": "neon branches reset development --parent --profile ynara --org-id org-patient-pond-01447185 --project-id long-lab-10816041"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

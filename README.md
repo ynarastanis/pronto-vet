@@ -67,7 +67,7 @@ Abra `http://<ip-do-computador>:3000` no celular.
 | `npm test` | Testes unitários (Vitest) |
 | `npm run db:migrate` | `prisma migrate dev`: cria e aplica migrations no banco local (`development`) |
 | `npm run db:seed` | Popula o banco local com dados de demonstração |
-| `npm run db:resetar-development-da-producao` | **Apaga** tudo o que foi feito no branch `development` do Neon e o recria como cópia atual do `main` (produção). Sem confirmação. Exige a CLI `neon` instalada e o perfil `ynara` logado |
+| `npm run db:reset` | **Apaga** tudo o que foi feito no branch `development` do Neon e o recria como cópia atual do `main` (produção). Sem confirmação. Exige a CLI `neon` instalada e o perfil `ynara` logado |
 | `postinstall` | Roda sozinho após `npm install`/`npm ci`: `prisma generate` |
 
 ## Fluxo de trabalho e deploy
