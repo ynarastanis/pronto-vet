@@ -1,4 +1,5 @@
 import { ErroNaoEncontrado, ErroNomeDuplicado } from "../erros";
+import { compararNomes, nomeContemTermo } from "../nomes";
 import type { Procedimento, ProcedimentoCompleto, ServicoProcedimentos } from "../tipos";
 
 export function criarServicoProcedimentos(lista: Procedimento[]): ServicoProcedimentos {
@@ -15,10 +16,9 @@ export function criarServicoProcedimentos(lista: Procedimento[]): ServicoProcedi
 
   return {
     async listar(busca = "") {
-      const termo = busca.trim().toLowerCase();
       return [...lista]
-        .filter((p) => p.nome.toLowerCase().includes(termo))
-        .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
+        .filter((p) => nomeContemTermo(p.nome, busca))
+        .sort((a, b) => compararNomes(a.nome, b.nome))
         .map((p) => ({
           id: p.id,
           nome: p.nome,
@@ -29,7 +29,7 @@ export function criarServicoProcedimentos(lista: Procedimento[]): ServicoProcedi
       const completos = lista.filter(
         (p): p is ProcedimentoCompleto => p.descricaoAnestesica !== null,
       );
-      return structuredClone(completos.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")));
+      return structuredClone(completos.sort((a, b) => compararNomes(a.nome, b.nome)));
     },
     async obter(id) {
       const p = lista.find((x) => x.id === id);
