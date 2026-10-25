@@ -46,6 +46,36 @@ function LinhasDestacadas({ segmentos }: { segmentos: Segmento[] }) {
   ));
 }
 
+/** Botão do cadeado de edição livre (cartão e modal). */
+function BotaoCadeado({
+  aberto,
+  desabilitado,
+  aoClicar,
+}: {
+  aberto: boolean;
+  desabilitado: boolean;
+  aoClicar: () => void;
+}) {
+  const rotulo = aberto
+    ? "Bloquear e voltar ao texto gerado"
+    : "Editar texto livremente";
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="icon"
+      className="size-10 text-foreground md:size-9"
+      aria-pressed={aberto}
+      aria-label={rotulo}
+      title={rotulo}
+      disabled={desabilitado}
+      onClick={aoClicar}
+    >
+      <IconeCadeado aberto={aberto} />
+    </Button>
+  );
+}
+
 type Exibido = {
   procedimentoId: string | null;
   texto: string | null;
@@ -139,6 +169,17 @@ export function CartaoTexto({
     }
   }
 
+  const confirmacao = (
+    <ConfirmarDescarte
+      aberto={confirmando}
+      aoMudar={setConfirmando}
+      aoConfirmar={() => {
+        setEdicao(fechar());
+        setConfirmando(false);
+      }}
+    />
+  );
+
   const realcadas = new Set(exibido.realce);
   const linhas = dividirEmLinhas(
     exibido.segmentos ?? [{ texto: exibido.texto ?? "" }],
@@ -166,27 +207,11 @@ export function CartaoTexto({
           >
             <ZoomIn aria-hidden="true" />
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="size-10 text-foreground md:size-9"
-            aria-pressed={edicao.aberta}
-            aria-label={
-              edicao.aberta
-                ? "Bloquear e voltar ao texto gerado"
-                : "Editar texto livremente"
-            }
-            title={
-              edicao.aberta
-                ? "Bloquear e voltar ao texto gerado"
-                : "Editar texto livremente"
-            }
-            disabled={texto === null}
-            onClick={alternarCadeado}
-          >
-            <IconeCadeado aberto={edicao.aberta} />
-          </Button>
+          <BotaoCadeado
+            aberto={edicao.aberta}
+            desabilitado={texto === null}
+            aoClicar={alternarCadeado}
+          />
           <BotaoCopiar
             texto={textoExibido(edicao, texto ?? "")}
             alvoRef={alvoRef}
@@ -196,38 +221,49 @@ export function CartaoTexto({
       }
     >
       <Dialog open={ampliado} onOpenChange={setAmpliado}>
-        <DialogContent className={`sm:max-w-3xl${classeTema ? ` ${classeTema}` : ""}`}>
-          <DialogHeader>
-            <DialogTitle>{titulo}</DialogTitle>
-          </DialogHeader>
-          <div className="max-h-[70vh] overflow-y-auto pr-1 text-base">
-            <div ref={alvoModalRef} className="texto-documento">
-              {edicao.aberta ? (
-                textoExibido(edicao, texto ?? "")
-              ) : (
-                <LinhasDestacadas
-                  segmentos={segmentos ?? [{ texto: texto ?? "" }]}
+        <DialogContent
+          className={`sm:max-w-3xl${classeTema ? ` ${classeTema}` : ""}`}
+        >
+          <DialogHeader className="pr-9">
+            <div className="flex items-center justify-between gap-3">
+              <DialogTitle>{titulo}</DialogTitle>
+              <div className="flex shrink-0 items-center gap-2">
+                <BotaoCadeado
+                  aberto={edicao.aberta}
+                  desabilitado={texto === null}
+                  aoClicar={alternarCadeado}
                 />
-              )}
+                <BotaoCopiar
+                  texto={textoExibido(edicao, texto ?? "")}
+                  alvoRef={alvoModalRef}
+                  aoMudarCopiado={() => {}}
+                />
+              </div>
             </div>
+          </DialogHeader>
+          <div ref={alvoModalRef} className="text-base">
+            {edicao.aberta ? (
+              <textarea
+                aria-label={`${titulo}, texto em edição livre`}
+                value={edicao.texto}
+                onChange={(e) => setEdicao(editar(edicao, e.target.value))}
+                className="texto-documento block max-h-[70vh] min-h-[50vh] w-full resize-y overflow-y-auto rounded-lg border border-edicao-fio bg-transparent p-3 outline-none [field-sizing:content] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-popover"
+              />
+            ) : (
+              <div className="max-h-[70vh] overflow-y-auto pr-1">
+                <div className="texto-documento">
+                  <LinhasDestacadas
+                    segmentos={segmentos ?? [{ texto: texto ?? "" }]}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-          <div className="flex justify-end">
-            <BotaoCopiar
-              texto={textoExibido(edicao, texto ?? "")}
-              alvoRef={alvoModalRef}
-              aoMudarCopiado={() => {}}
-            />
-          </div>
+          {/* Dentro do Dialog, para o alerta empilhar acima do modal. */}
+          {confirmacao}
         </DialogContent>
       </Dialog>
-      <ConfirmarDescarte
-        aberto={confirmando}
-        aoMudar={setConfirmando}
-        aoConfirmar={() => {
-          setEdicao(fechar());
-          setConfirmando(false);
-        }}
-      />
+      {!ampliado && confirmacao}
       {edicao.aberta ? (
         <div key="edicao" className="trocar-modo">
           <div ref={alvoRef}>
