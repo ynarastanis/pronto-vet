@@ -470,3 +470,34 @@ svg.lucide {
     font-size: clamp(16px, 1.778px + 1.389vw, 24px);
   }
 }
+
+/* Esqueletos de carregamento (loading.tsx): bloco --muted com brilho suave que varre da esquerda
+   para a direita. Sem animação com prefers-reduced-motion (a regra global só encurtaria o ciclo). */
+@keyframes pv-brilho {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+.esqueleto {
+  background-color: color-mix(in oklab, var(--muted), var(--border) 40%);
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklab, var(--card), transparent 35%) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: pv-brilho 1.6s var(--curva) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto {
+    animation: none;
+    background-image: none;
+  }
+}
