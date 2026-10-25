@@ -67,6 +67,7 @@ export function CartaoTexto({
   texto,
   segmentos,
   procedimentoId,
+  tema,
 }: {
   titulo: string;
   icone: React.ReactNode;
@@ -74,7 +75,10 @@ export function CartaoTexto({
   /** Mesmo texto, em trechos; só para o destaque visual. */
   segmentos: Segmento[] | null;
   procedimentoId: string | null;
+  /** Paleta de destaque do cartão; sem valor, o verde padrão. */
+  tema?: "anestesico";
 }) {
+  const classeTema = tema === "anestesico" ? "tema-anestesico" : undefined;
   const alvoRef = useRef<HTMLDivElement>(null);
   const [copiado, setCopiado] = useState(false);
   const [edicao, setEdicao] = useState(estadoInicial);
@@ -146,6 +150,7 @@ export function CartaoTexto({
       icone={icone}
       copiado={copiado}
       emEdicao={edicao.aberta}
+      className={classeTema}
       notaEdicao="Edição livre. Feche o cadeado para voltar ao texto gerado."
       acao={
         <div className="flex shrink-0 items-center gap-2">
@@ -191,7 +196,7 @@ export function CartaoTexto({
       }
     >
       <Dialog open={ampliado} onOpenChange={setAmpliado}>
-        <DialogContent className="sm:max-w-3xl">
+        <DialogContent className={`sm:max-w-3xl${classeTema ? ` ${classeTema}` : ""}`}>
           <DialogHeader>
             <DialogTitle>{titulo}</DialogTitle>
           </DialogHeader>

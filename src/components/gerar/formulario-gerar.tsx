@@ -177,6 +177,7 @@ export function FormularioGerar({
         />
         <CartaoTexto
           titulo="Descrição Anestésica"
+          tema="anestesico"
           icone={<Syringe aria-hidden className="size-[1.125rem]" />}
           texto={textos?.anestesico ?? null}
           segmentos={textos?.segmentosAnestesico ?? null}

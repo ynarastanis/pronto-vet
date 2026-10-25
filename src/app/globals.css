@@ -134,6 +134,26 @@
   --sidebar-ring: #5fd3a4;
 }
 
+/* Descrição Anestésica: destaques em violeta (o verde fica com a cirúrgica). Escopo local
+   que redefine só os tokens de destaque; fundo e texto seguem o tema. Violeta, e não azul,
+   para não se confundir com --edicao (edição livre). Texto sobre --primary: AA nos dois temas. */
+.tema-anestesico {
+  --primary: #6a3fb0;
+  --primary-foreground: #ffffff;
+  --ring: #6a3fb0;
+  --accent: #f0eafa;
+  --accent-foreground: #4f2a93;
+  --copiado: #9a73dd;
+}
+.dark .tema-anestesico {
+  --primary: #bda8f4;
+  --primary-foreground: #17112b;
+  --ring: #bda8f4;
+  --accent: #2b2152;
+  --accent-foreground: #d3c5f9;
+  --copiado: #a78bea;
+}
+
 @layer base {
   * {
     @apply border-border;

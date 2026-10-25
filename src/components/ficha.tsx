@@ -12,6 +12,7 @@ export function Ficha({
   copiado = false,
   emEdicao = false,
   notaEdicao,
+  className,
   children,
 }: {
   titulo: string;
@@ -22,13 +23,15 @@ export function Ficha({
   emEdicao?: boolean;
   /** Nota sob o título, visível só em edição (fade + altura). */
   notaEdicao?: string;
+  /** Classe extra na raiz (ex.: `tema-anestesico`). */
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
     <section
       data-copiado={copiado ? "true" : "false"}
       data-edicao={emEdicao ? "true" : "false"}
-      className="ficha relative min-w-0 overflow-hidden rounded-2xl border bg-card pl-1.5"
+      className={`ficha relative min-w-0 overflow-hidden rounded-2xl border bg-card pl-1.5${className ? ` ${className}` : ""}`}
     >
       <span
         aria-hidden
