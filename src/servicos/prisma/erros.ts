@@ -1,6 +1,6 @@
 import { ErroNaoEncontrado, ErroNomeDuplicado } from "../erros";
 
-type ErroComCodigo = { code: string; meta?: unknown };
+type ErroComCodigo = { code: string; meta?: unknown; message?: unknown };
 
 function temCodigo(erro: unknown): erro is ErroComCodigo {
   return (
@@ -42,6 +42,13 @@ export function traduzirErroPrisma(erro: unknown): unknown {
   if (!temCodigo(erro)) return erro;
   if (erro.code === "P2002") {
     return alvosDoP2002(erro.meta).some((alvo) => alvo.includes("nome"))
+      ? new ErroNomeDuplicado()
+      : erro;
+  }
+  // O adapter HTTP do Neon não converte o erro do Postgres: chega com o código SQLSTATE cru
+  // (23505) e sem `meta.target`; a restrição só aparece no texto ("..._nome_key").
+  if (erro.code === "23505") {
+    return typeof erro.message === "string" && /_nome_key/.test(erro.message)
       ? new ErroNomeDuplicado()
       : erro;
   }

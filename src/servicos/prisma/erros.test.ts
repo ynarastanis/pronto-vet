@@ -28,6 +28,23 @@ describe("traduzirErroPrisma", () => {
     expect(traduzirErroPrisma(erro)).toBeInstanceOf(ErroNomeDuplicado);
   });
 
+  it("23505 cru do driver HTTP do Neon, na restrição do nome, vira ErroNomeDuplicado", () => {
+    const erro = {
+      code: "23505",
+      meta: { modelName: "ProcedimentoCirurgico" },
+      message: "duplicate key value violates unique constraint \"ProcedimentoCirurgico_nome_key\"",
+    };
+    expect(traduzirErroPrisma(erro)).toBeInstanceOf(ErroNomeDuplicado);
+  });
+
+  it("23505 cru em outra restrição não vira ErroNomeDuplicado", () => {
+    const erro = {
+      code: "23505",
+      message: "duplicate key value violates unique constraint \"DescricaoAnestesica_procedimentoId_key\"",
+    };
+    expect(traduzirErroPrisma(erro)).toBe(erro);
+  });
+
   it("P2002 em outro campo não vira ErroNomeDuplicado", () => {
     const erro = { code: "P2002", meta: { target: ["procedimentoId"] } };
     expect(traduzirErroPrisma(erro)).toBe(erro);

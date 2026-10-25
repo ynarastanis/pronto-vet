@@ -97,9 +97,10 @@ export function criarServicoProcedimentos(): ServicoProcedimentos {
             descricaoTecnica: dados.descricaoTecnica,
             prescricao: dados.prescricao,
           },
-          include: incluirDescricao,
         });
-        return paraDominio(linha);
+        // Procedimento recém-criado nunca tem descrição anestésica. Sem `include`: o driver HTTP
+        // do Neon não suporta a transação implícita que o Prisma abre para escrita com relação.
+        return paraDominio({ ...linha, descricaoAnestesica: null });
       } catch (e) {
         throw traduzirErroPrisma(e);
       }
@@ -113,9 +114,12 @@ export function criarServicoProcedimentos(): ServicoProcedimentos {
             descricaoTecnica: dados.descricaoTecnica,
             prescricao: dados.prescricao,
           },
-          include: incluirDescricao,
         });
-        return paraDominio(linha);
+        // Leitura separada (sem `include`) pelo mesmo motivo do `criar`: driver HTTP sem transação.
+        const descricaoAnestesica = await db.descricaoAnestesica.findUnique({
+          where: { procedimentoId: id },
+        });
+        return paraDominio({ ...linha, descricaoAnestesica });
       } catch (e) {
         throw traduzirErroPrisma(e);
       }
