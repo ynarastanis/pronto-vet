@@ -134,9 +134,27 @@
   --sidebar-ring: #5fd3a4;
 }
 
-/* Descrição Anestésica: destaques em violeta (o verde fica com a cirúrgica). Escopo local
-   que redefine só os tokens de destaque; fundo e texto seguem o tema. Violeta, e não azul,
-   para não se confundir com --edicao (edição livre). Texto sobre --primary: AA nos dois temas. */
+/* Temas por descrição: escopos locais que redefinem só os tokens de destaque; fundo e texto
+   seguem o tema. Cirúrgica em terracota (tijolo), anestésica em violeta; o verde fica com o
+   app. Violeta, e não azul, para não se confundir com --edicao (edição livre); terracota, e
+   não âmbar, para não se confundir com a pílula de ambiente. Texto sobre --primary e
+   --accent-foreground sobre --accent: AA nos dois temas. */
+.tema-cirurgico {
+  --primary: #b23a26;
+  --primary-foreground: #ffffff;
+  --ring: #b23a26;
+  --accent: #fbebe6;
+  --accent-foreground: #8f2a1a;
+  --copiado: #d4694f;
+}
+.dark .tema-cirurgico {
+  --primary: #f09a84;
+  --primary-foreground: #2a0f09;
+  --ring: #f09a84;
+  --accent: #4a1f16;
+  --accent-foreground: #f6c4b6;
+  --copiado: #e07f66;
+}
 .tema-anestesico {
   --primary: #6a3fb0;
   --primary-foreground: #ffffff;

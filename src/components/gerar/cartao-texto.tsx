@@ -106,9 +106,9 @@ export function CartaoTexto({
   segmentos: Segmento[] | null;
   procedimentoId: string | null;
   /** Paleta de destaque do cartão; sem valor, o verde padrão. */
-  tema?: "anestesico";
+  tema?: "cirurgico" | "anestesico";
 }) {
-  const classeTema = tema === "anestesico" ? "tema-anestesico" : undefined;
+  const classeTema = tema ? `tema-${tema}` : undefined;
   const alvoRef = useRef<HTMLDivElement>(null);
   const [copiado, setCopiado] = useState(false);
   const [edicao, setEdicao] = useState(estadoInicial);
