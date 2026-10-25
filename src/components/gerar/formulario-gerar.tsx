@@ -170,6 +170,7 @@ export function FormularioGerar({
       <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
         <CartaoTexto
           titulo="Descrição Cirúrgica"
+          tema="cirurgico"
           icone={<Slice aria-hidden className="size-[1.125rem]" />}
           texto={textos?.cirurgico ?? null}
           segmentos={textos?.segmentosCirurgico ?? null}
@@ -177,6 +178,7 @@ export function FormularioGerar({
         />
         <CartaoTexto
           titulo="Descrição Anestésica"
+          tema="anestesico"
           icone={<Syringe aria-hidden className="size-[1.125rem]" />}
           texto={textos?.anestesico ?? null}
           segmentos={textos?.segmentosAnestesico ?? null}

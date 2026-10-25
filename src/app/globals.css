@@ -15,6 +15,8 @@
   --color-edicao: var(--edicao);
   --color-edicao-suave: var(--edicao-suave);
   --color-edicao-fio: var(--edicao-fio);
+  --color-campo: var(--campo);
+  --color-campo-edicao: var(--campo-edicao);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -77,6 +79,9 @@
   --edicao: #2f6db0;
   --edicao-suave: #eef4fb;
   --edicao-fio: #b7cdea;
+  /* Fundo das áreas de texto: destoa do card/popover (campo) e da Ficha em edição (campo-edicao). */
+  --campo: #eaf1ee;
+  --campo-edicao: #ffffff;
   --chart-1: #0e5c4d;
   --chart-2: #2fa676;
   --chart-3: #5b6e67;
@@ -119,6 +124,8 @@
   --edicao: #7fb0ea;
   --edicao-suave: #132338;
   --edicao-fio: #2a4466;
+  --campo: #0a1511;
+  --campo-edicao: #0d1a2b;
   --chart-1: #5fd3a4;
   --chart-2: #4cc995;
   --chart-3: #93a9a0;
@@ -132,6 +139,60 @@
   --sidebar-accent-foreground: #5fd3a4;
   --sidebar-border: #24403a;
   --sidebar-ring: #5fd3a4;
+}
+
+/* Temas por descrição: escopos locais que redefinem só os tokens de destaque; fundo e texto
+   seguem o tema. Cirúrgica em terracota (tijolo), anestésica em violeta; o verde fica com o
+   app. Violeta, e não azul, para não se confundir com o azul global da edição livre; terracota, e
+   não âmbar, para não se confundir com a pílula de ambiente. Cada tema também redefine
+   --edicao, --edicao-suave, --edicao-fio (e --campo-edicao no escuro) na sua família de cor,
+   para a edição livre seguir a cor da descrição; os globais (:root/.dark) continuam azuis. Texto sobre --primary e
+   --accent-foreground sobre --accent: AA nos dois temas. */
+.tema-cirurgico {
+  --primary: #b23a26;
+  --primary-foreground: #ffffff;
+  --ring: #b23a26;
+  --accent: #fbebe6;
+  --accent-foreground: #8f2a1a;
+  --copiado: #d4694f;
+  --edicao: #9c3220;
+  --edicao-suave: #fbeee9;
+  --edicao-fio: #e8b8aa;
+}
+.dark .tema-cirurgico {
+  --primary: #f09a84;
+  --primary-foreground: #2a0f09;
+  --ring: #f09a84;
+  --accent: #4a1f16;
+  --accent-foreground: #f6c4b6;
+  --copiado: #e07f66;
+  --edicao: #f0a591;
+  --edicao-suave: #2e1712;
+  --edicao-fio: #5e2e22;
+  --campo-edicao: #1f0f0b;
+}
+.tema-anestesico {
+  --primary: #6a3fb0;
+  --primary-foreground: #ffffff;
+  --ring: #6a3fb0;
+  --accent: #f0eafa;
+  --accent-foreground: #4f2a93;
+  --copiado: #9a73dd;
+  --edicao: #5b34a0;
+  --edicao-suave: #f3eefb;
+  --edicao-fio: #cdbbe9;
+}
+.dark .tema-anestesico {
+  --primary: #bda8f4;
+  --primary-foreground: #17112b;
+  --ring: #bda8f4;
+  --accent: #2b2152;
+  --accent-foreground: #d3c5f9;
+  --copiado: #a78bea;
+  --edicao: #c3b0f6;
+  --edicao-suave: #1e1838;
+  --edicao-fio: #43377a;
+  --campo-edicao: #150f2a;
 }
 
 @layer base {
@@ -163,6 +224,12 @@
   max-width: 72ch;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+/* Modal da lupa: ocupa a largura toda. Fora de @layer e depois de .texto-documento,
+   senão `max-w-none` do Tailwind não vence o 72ch. */
+.texto-documento.texto-largo {
+  max-width: none;
 }
 
 /* Campos editáveis com no mínimo 16px no celular/toque: abaixo disso o iOS
@@ -404,7 +471,7 @@
   animation: pv-clique-fechar 160ms var(--curva);
 }
 
-/* Ficha em edição livre: modo azul (tokens --edicao*), transição de 220ms. */
+/* Ficha em edição livre: modo de edição (tokens --edicao*; azul, ou a cor do tema), transição de 220ms. */
 .ficha {
   transition:
     background-color 220ms var(--curva),
@@ -500,4 +567,9 @@ svg.lucide {
     animation: none;
     background-image: none;
   }
+}
+
+/* Fundo animado da tela de login: surge com fade suave. */
+.fundo-celulas {
+  animation: pv-fade 600ms var(--curva) both;
 }

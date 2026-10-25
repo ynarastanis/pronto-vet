@@ -17,7 +17,7 @@ function estaAtivo(href: string, caminho: string) {
   return href === "/" ? caminho === "/" : caminho.startsWith(href);
 }
 
-export function BarraNavegacao() {
+export function BarraNavegacao({ ambiente }: { ambiente: string | null }) {
   const caminho = usePathname();
   const lista = useRef<HTMLDivElement>(null);
   const pilula = useRef<HTMLSpanElement>(null);
@@ -103,16 +103,23 @@ export function BarraNavegacao() {
           })}
         </div>
 
-        <form action={sair} className="shrink-0">
-          <button
-            type="submit"
-            aria-label="Sair"
-            className="flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg text-sm text-muted-foreground sm:px-2.5 transition-colors duration-[180ms] outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-          >
-            <LogOut aria-hidden className="size-4" />
-            <span className="hidden sm:inline">Sair</span>
-          </button>
-        </form>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {ambiente && (
+            <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[0.6875rem] font-medium text-amber-900 dark:bg-amber-400/15 dark:text-amber-300">
+              {ambiente}
+            </span>
+          )}
+          <form action={sair} className="shrink-0">
+            <button
+              type="submit"
+              aria-label="Sair"
+              className="flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg text-sm text-muted-foreground sm:px-2.5 transition-colors duration-[180ms] outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            >
+              <LogOut aria-hidden className="size-4" />
+              <span className="hidden sm:inline">Sair</span>
+            </button>
+          </form>
+        </div>
       </nav>
     </header>
   );
