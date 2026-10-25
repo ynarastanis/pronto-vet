@@ -17,3 +17,6 @@ npm-debug.log*
 
 # prisma
 /src/generated/
+
+# configuração local do navegador do app
+.claude/launch.json
